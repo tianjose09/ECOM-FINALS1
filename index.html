@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brew-Ha Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Stardos+Stencil:wght@700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body>
+
+<nav>
+    <div class="nav-left">
+        <div class="brand-container">
+            <div class="account-dropdown-container" id="accountDropdown">
+                <svg class="account-icon" stroke="white" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="7" r="4" />
+                    <path d="M5.5 21c1.5-4 11-4 13 0" />
+                </svg>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <a href="#">Logout</a>
+                </div>
+            </div>
+            <a href="index.html" class="brewha-text">BREW-HA</a>
+        </div>
+    </div>
+    <div class="nav-right">
+        <a href="index.html" class="active">Home</a>
+        <a href="products.html">Menu</a>
+        <a href="order.html">Order</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact</a>
+    </div>
+</nav>
+
+
+<div class="main-container">
+
+    <div class="hero-section">
+    <img src="./assets/img/Header_Home.png" alt="Brew-Ha Hero" class="hero-img">
+    </div>  
+
+    <div class="inner-main-container">
+    <section class="whats-new-section">
+        <div class="whats-new-header">
+            <h2>WHAT'S NEW?</h2>
+            <p>Discover the latest blends, seasonal treats, and exciting updates from our café.</p>
+        </div>
+        
+        <div class="carousel-wrapper">
+            <button class="nav-arrow" onclick="scrollCarousel('left')"><i class="fas fa-chevron-left"></i></button>
+            
+            <div class="carousel-container" id="whatsNewCarousel">
+                
+                <div class="product-card">
+                    <img src="./assets/img/your-product.png" alt="Product Name" class="product-img">
+                    <h3>Name</h3>
+                    <p>Lorem ipsum Lorem ipsum<br>Lorem ipsum Lorem ipsum</p>
+                    <div class="card-bottom">
+                        <span class="price">$4.00</span>
+                        <button class="add-btn">Add to cart</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <img src="Photos/your-product.png" alt="Product Name" class="product-img">
+                    <h3>Name</h3>
+                    <p>Lorem ipsum Lorem ipsum<br>Lorem ipsum Lorem ipsum</p>
+                    <div class="card-bottom">
+                        <span class="price">$4.00</span>
+                        <button class="add-btn">Add to cart</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <img src="Photos/your-product.png" alt="Product Name" class="product-img">
+                    <h3>Name</h3>
+                    <p>Lorem ipsum Lorem ipsum<br>Lorem ipsum Lorem ipsum</p>
+                    <div class="card-bottom">
+                        <span class="price">$4.00</span>
+                        <button class="add-btn">Add to cart</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <img src="Photos/your-product.png" alt="Product Name" class="product-img">
+                    <h3>Name</h3>
+                    <p>Lorem ipsum Lorem ipsum<br>Lorem ipsum Lorem ipsum</p>
+                    <div class="card-bottom">
+                        <span class="price">$4.00</span>
+                        <button class="add-btn">Add to cart</button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <img src="Photos/your-product.png" alt="Product Name" class="product-img">
+                    <h3>Name</h3>
+                    <p>Lorem ipsum Lorem ipsum<br>Lorem ipsum Lorem ipsum</p>
+                    <div class="card-bottom">
+                        <span class="price">$4.00</span>
+                        <button class="add-btn">Add to cart</button>
+                    </div>
+                </div>
+
+            </div>
+            
+            <button class="nav-arrow" onclick="scrollCarousel('right')"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        
+        <div class="pagination-dots">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <h2>FEATURES</h2>
+        <div class="features-layout">
+            <div class="feature-left">
+                <img src="./assets/img/Featured_Home.png" alt="Store Features" class="feature-img">
+                <p>There are no secret spell - only honest work!</p>
+            </div>
+            
+            <div class="feature-right">
+                <div class="feature-icons-row">
+                    <div class="icon-item">
+                        <div class="icon-circle">
+                            <span class="material-icons"><img src="./assets/img/DeliveryIcon.png" alt="On Time Delivery"></span>
+                        </div>
+                        <span>On Time Delivery</span>
+                    </div>
+                    <div class="icon-item">
+                        <div class="icon-circle">
+                            <span class="material-icons"><img src="./assets/img/BrewedIcon.png" alt="Freshly Brewed"></span>
+                        </div>
+                        <span>Freshly Brewed</span>
+                    </div>
+                    <div class="icon-item">
+                        <div class="icon-circle">
+                            <span class="material-icons"><img src="./assets/img/NaturalngIcon.png" alt="Natural Ingredients"></span>
+                        </div>
+                        <span>Natural Ingredients</span>
+                    </div>
+                </div>
+                
+                <p class="feature-description">
+                    Brew-Ha is a modern coffee shop dedicated to serving freshly brewed coffee made from natural,
+                    high-quality ingredients. We focus on delivering rich flavors and a comforting café experience with every cup.
+                    With our reliable on-time delivery service, you can enjoy your favorite coffee wherever you are. At Brew-Ha,
+                    freshness, quality, and convenience come together in every brew.
+                </p>
+            </div>
+        </div>
+    </section>
+    </div>
+</div>
+
+<footer>
+  <div class="footer-top-row">
+    <div class="footer-brewha">BREW-HA</div>
+  </div>
+  <div class="footer-divider"></div>
+  <div class="footer-bottom-row">
+    <div class="footer-copyright">© 2026 All Rights Reserved</div>
+    <div class="footer-social">
+      <span>Follow Us</span>
+      <a href="https://www.facebook.com" target="_blank">
+        <svg class="footer-social-icon" viewBox="0 0 24 24">
+          <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.877v-6.987h-2.54v-2.89h2.54v-2.205c0-2.507 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.463h-1.26c-1.243 0-1.63.771-1.63 1.562v1.875h2.773l-.443 2.89h-2.33v6.987C18.343 21.128 22 16.991 22 12z"/>
+        </svg>
+      </a>
+      <a href="https://www.instagram.com" target="_blank">
+        <svg class="footer-social-icon" viewBox="0 0 24 24">
+          <path d="M7.75 2A5.75 5.75 0 002 7.75v8.5A5.75 5.75 0 007.75 22h8.5A5.75 5.75 0 0022 16.25v-8.5A5.75 5.75 0 0016.25 2h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm5.25-1.5a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0zM12 9a3 3 0 100 6 3 3 0 000-6z"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script src="./assets/js/script.js"></script>
+
+</body>
+</html>
