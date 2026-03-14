@@ -262,7 +262,6 @@ function openModal(sectionId, productName) {
                 <div class="action-buttons">
                     <button class="add-to-cart-btn" onclick="addToCart('${product.name.replace(/'/g, "\\'")}', ${product.price}, '${sectionId}', '${product.img}', '${product.category}')">Add to Cart</button>
                     <button class="add-to-cart-btn" style="background: #4a4f35;" onclick="orderNow('${product.name.replace(/'/g, "\\'")}', ${product.price}, '${sectionId}', '${product.img}', '${product.category}')">Order Now</button>
-                    <button class="heart-btn" onclick="toggleLike(this)" title="Add to favorites"><i class="fas fa-heart"></i></button>
                 </div>
             </div>
         </div>
