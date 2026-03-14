@@ -8,11 +8,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Stardos+Stencil:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="../Product Catalog Page/assets/css/style.css">
 </head>
 <body>
 
-<!-- NAVBAR with search and cart icons -->
 <nav>
     <div class="nav-left">
         <div class="brand-container">
@@ -25,7 +24,7 @@
                     <a href="#" role="menuitem">Logout</a>
                 </div>
             </div>
-            <a href="index.html" class="brewha-text">BREW-HA</a>
+            <a href="/index.html" class="brewha-text">BREW-HA</a>
         </div>
     </div>
 
@@ -38,7 +37,7 @@
         <a href="#" class="icon-link" id="searchIcon">
             <i class="fas fa-search"></i>
         </a>
-        <a href="#" class="icon-link" id="cartLink">
+        <a href="../Cart Page/index.html" class="icon-link" id="cartLink">
             <div class="cart-icon-container">
                 <i class="fas fa-shopping-cart"></i>
                 <span class="cart-badge" id="cartBadge">0</span>
@@ -47,7 +46,6 @@
     </div>
 </nav>
 
-<!-- Search Overlay -->
 <div class="search-overlay" id="searchOverlay">
     <div class="search-header">
         <input type="text" id="searchInput" placeholder="Search 'drinks', 'pastry', 'pasta' or item name...">
@@ -57,7 +55,6 @@
     <div class="search-results" id="searchResults"></div>
 </div>
 
-<!-- FILTERS -->
 <div class="filter-bar">
     <button class="filter-btn" onclick="filterMenu('drinksSection')">Drinks</button>
     <button class="filter-btn" onclick="filterMenu('pastrySection')">Pastry</button>
@@ -73,7 +70,6 @@
     </div>
 </div>
 
-<!-- DRINKS SECTION -->
 <div class="menu-section" id="drinksSection">
     <div class="hero">
         <img src="assets/img/drinkss.png" alt="Drinks" onerror="this.src='https://via.placeholder.com/1200x250?text=Drinks'">
@@ -91,7 +87,6 @@
     </div>
 </div>
 
-<!-- PASTRY SECTION -->
 <div class="menu-section" id="pastrySection">
     <div class="hero">
         <img src="assets/img/pastryy.png" alt="Pastry" onerror="this.src='https://via.placeholder.com/1200x250?text=Pastry'">
@@ -109,7 +104,6 @@
     </div>
 </div>
 
-<!-- PASTA SECTION -->
 <div class="menu-section" id="pastaSection">
     <div class="hero">
         <img src="assets/img/pastabannerr.png" alt="Pasta" onerror="this.src='https://via.placeholder.com/1200x250?text=Pasta'">
@@ -127,7 +121,6 @@
     </div>
 </div>
 
-<!-- PRODUCT DETAIL MODAL -->
 <div class="modal-overlay" id="productModal">
     <div class="modal-container">
         <span class="modal-close" onclick="closeModal()">&times;</span>
@@ -135,7 +128,6 @@
     </div>
 </div>
 
-<!-- SUCCESS MODAL -->
 <div class="success-overlay" id="successModal">
     <div class="success-modal">
         <i class="fas fa-check-circle"></i>
@@ -145,7 +137,6 @@
     </div>
 </div>
 
-<!-- FOOTER -->
 <footer>
     <div class="footer-top-row">
         <div class="footer-brewha">BREW-HA</div>
@@ -169,6 +160,6 @@
     </div>
 </footer>
 
-<script src="assets/js/scripts.js"></script>
+<script src="../Product Catalog Page/assets/js/scripts.js"></script>
 </body>
 </html>
