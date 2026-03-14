@@ -1,0 +1,122 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #f7f1ea;
+}
+
+.loading-page {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: #f7f1ea;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Animated coffee bean layers */
+.bean-layer {
+  position: absolute;
+  inset: -200px 0 -200px 0;
+  background-repeat: repeat;
+  background-size: 220px 220px;
+  opacity: 1;
+  pointer-events: none;
+}
+
+/* First layer */
+.bean-layer-1 {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg fill='none' stroke='%23d8c2ae' stroke-width='2' opacity='0.9'%3E%3Cellipse cx='30' cy='25' rx='15' ry='9' transform='rotate(25 30 25)'/%3E%3Cpath d='M24 18 C30 22,30 28,36 32'/%3E%3Cellipse cx='95' cy='35' rx='16' ry='10' transform='rotate(-20 95 35)'/%3E%3Cpath d='M89 27 C95 31,95 38,101 43'/%3E%3Cellipse cx='165' cy='28' rx='15' ry='9' transform='rotate(38 165 28)'/%3E%3Cpath d='M159 20 C165 24,165 31,171 36'/%3E%3Cellipse cx='55' cy='95' rx='16' ry='10' transform='rotate(-35 55 95)'/%3E%3Cpath d='M49 87 C55 92,55 99,61 104'/%3E%3Cellipse cx='125' cy='90' rx='15' ry='9' transform='rotate(18 125 90)'/%3E%3Cpath d='M119 82 C125 87,125 94,131 99'/%3E%3Cellipse cx='190' cy='102' rx='16' ry='10' transform='rotate(-12 190 102)'/%3E%3Cpath d='M184 94 C190 99,190 106,196 111'/%3E%3Cellipse cx='28' cy='165' rx='15' ry='9' transform='rotate(-28 28 165)'/%3E%3Cpath d='M22 157 C28 161,28 168,34 173'/%3E%3Cellipse cx='92' cy='168' rx='16' ry='10' transform='rotate(32 92 168)'/%3E%3Cpath d='M86 160 C92 165,92 172,98 177'/%3E%3Cellipse cx='160' cy='165' rx='15' ry='9' transform='rotate(-18 160 165)'/%3E%3Cpath d='M154 157 C160 162,160 169,166 174'/%3E%3C/g%3E%3C/svg%3E");
+  animation: beansFall 10s linear infinite;
+}
+
+/* Second layer for depth */
+.bean-layer-2 {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260'%3E%3Cg fill='none' stroke='%23cdb39b' stroke-width='1.8' opacity='0.5'%3E%3Cellipse cx='40' cy='40' rx='14' ry='8' transform='rotate(10 40 40)'/%3E%3Cpath d='M34 33 C40 37,40 43,46 48'/%3E%3Cellipse cx='135' cy='55' rx='15' ry='9' transform='rotate(-30 135 55)'/%3E%3Cpath d='M129 47 C135 52,135 59,141 64'/%3E%3Cellipse cx='220' cy='35' rx='14' ry='8' transform='rotate(25 220 35)'/%3E%3Cpath d='M214 28 C220 32,220 38,226 43'/%3E%3Cellipse cx='70' cy='145' rx='15' ry='9' transform='rotate(-22 70 145)'/%3E%3Cpath d='M64 138 C70 142,70 149,76 154'/%3E%3Cellipse cx='165' cy='140' rx='14' ry='8' transform='rotate(35 165 140)'/%3E%3Cpath d='M159 133 C165 138,165 144,171 149'/%3E%3Cellipse cx='230' cy='180' rx='15' ry='9' transform='rotate(-15 230 180)'/%3E%3Cpath d='M224 173 C230 177,230 184,236 189'/%3E%3Cellipse cx='45' cy='225' rx='14' ry='8' transform='rotate(28 45 225)'/%3E%3Cpath d='M39 218 C45 222,45 229,51 234'/%3E%3Cellipse cx='130' cy='225' rx='15' ry='9' transform='rotate(-10 130 225)'/%3E%3Cpath d='M124 218 C130 223,130 229,136 234'/%3E%3C/g%3E%3C/svg%3E");
+  animation: beansFallSlow 16s linear infinite;
+}
+
+@keyframes beansFall {
+  from {
+    transform: translateY(-220px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes beansFallSlow {
+  from {
+    transform: translateY(-260px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Center content */
+.loading-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 20px;
+}
+
+.brand-title {
+  font-size: clamp(3rem, 10vw, 7rem);
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: #4a2a1d;
+  text-shadow:
+    0 6px 0 rgba(58, 32, 22, 0.35),
+    0 14px 24px rgba(0, 0, 0, 0.18);
+  margin-bottom: 28px;
+}
+
+.loading-bar-container {
+  width: min(320px, 80vw);
+  height: 14px;
+  background: rgba(93, 38, 18, 0.15);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 0 auto 16px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.loading-bar {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #5d2612, #7b3a20);
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+
+.loading-text {
+  font-size: 1rem;
+  color: #5d2612;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 600px) {
+  .brand-title {
+    letter-spacing: 2px;
+  }
+
+  .loading-text {
+    font-size: 0.92rem;
+  }
+}

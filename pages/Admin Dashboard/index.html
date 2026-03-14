@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BREW-HA Admin Dashboard</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Stardos+Stencil:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <link rel="stylesheet" href="../Admin Dashboard/assets/css/style.css">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <div class="brand-container">
+        <div class="account-dropdown-container" id="accountDropdown" tabindex="0" aria-haspopup="true" aria-expanded="false">
+          <svg class="account-icon" stroke="white" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="7" r="4"></circle>
+            <path d="M5.5 21c1.5-4 11-4 13 0"></path>
+          </svg>
+
+          <div class="dropdown-menu" id="dropdownMenu" role="menu">
+            <a href="#" role="menuitem">Admin Profile</a>
+            <a href="#" role="menuitem">Logout</a>
+          </div>
+        </div>
+
+        <a href="index.html" class="brewha-text">BREW-HA</a>
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <a href="#" class="refresh-link" id="refreshDashboardBtn" title="Refresh Dashboard">
+        <i class="fas fa-arrow-rotate-right"></i>
+      </a>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="dashboard-page">
+    <section class="dashboard-header">
+      <h1>ADMIN DASHBOARD</h1>
+      <h2>Product/Order Management</h2>
+    </section>
+
+    <!-- CATEGORY FILTERS -->
+    <section class="category-section">
+      <button class="category-btn drink-btn active" data-category="drink" type="button">Drink</button>
+      <button class="category-btn pastry-btn" data-category="pastry" type="button">Pastry</button>
+      <button class="category-btn pasta-btn" data-category="pasta" type="button">Pasta</button>
+    </section>
+
+    <!-- PRODUCT TABLE -->
+    <section class="product-panel">
+      <div class="product-table-header">
+        <div>Product Name</div>
+        <div>Price</div>
+        <div>Status</div>
+        <div>Total Order</div>
+        <div class="actions-col">Actions</div>
+      </div>
+
+      <div class="product-table-body" id="productTableBody">
+        <!-- Dynamic rows -->
+      </div>
+    </section>
+
+    <div class="section-divider">
+      <span class="divider-plus"><i class="fas fa-circle-plus"></i></span>
+    </div>
+
+    <!-- LOWER PANELS -->
+    <section class="bottom-panels">
+      <!-- USERS -->
+      <aside class="users-panel">
+        <div class="users-panel-inner">
+          <h3>List of Users</h3>
+          <div class="users-list" id="usersList">
+            <!-- Dynamic users -->
+          </div>
+        </div>
+      </aside>
+
+      <!-- SELECTED USER -->
+      <section class="selected-user-panel">
+        <div class="selected-user-inner">
+          <h3 id="selectedUserName">Selected User Name Here</h3>
+
+          <div class="orders-table">
+            <div class="orders-table-header">
+              <div>Name</div>
+              <div>Qty. | Size</div>
+              <div>Order No.</div>
+            </div>
+
+            <div class="orders-table-body" id="selectedUserOrders">
+              <!-- Dynamic orders -->
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-top-row">
+      <div class="footer-brewha">BREW-HA</div>
+    </div>
+
+    <div class="footer-divider"></div>
+
+    <div class="footer-bottom-row">
+      <div class="footer-copyright">© 2025 All Rights Reserved</div>
+      <div class="footer-social">
+        <span>Follow Us</span>
+        <a href="https://www.facebook.com" target="_blank" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+        <a href="https://www.instagram.com" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- EDIT PRODUCT MODAL -->
+  <div class="modal-overlay" id="productModal">
+    <div class="modal-box">
+      <button class="modal-close" id="closeProductModal" type="button">&times;</button>
+      <h3>Edit Product</h3>
+
+      <form id="productForm">
+        <input type="hidden" id="productId">
+
+        <label for="productName">Product Name</label>
+        <input type="text" id="productName" required>
+
+        <label for="productPrice">Price</label>
+        <input type="number" id="productPrice" min="0" step="0.01" required>
+
+        <label for="productStatus">Status</label>
+        <select id="productStatus" required>
+          <option value="Available">Available</option>
+          <option value="Not Available">Not Available</option>
+        </select>
+
+        <div class="modal-actions">
+          <button type="button" class="secondary-btn" id="cancelProductEdit">Cancel</button>
+          <button type="submit" class="primary-btn">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../Admin Dashboard/assets/js/scripts.js"></script>
+</body>
+</html>
