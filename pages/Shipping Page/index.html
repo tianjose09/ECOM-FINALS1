@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BREW-HA - Shipping</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Stardos+Stencil:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <link rel="stylesheet" href="../Shipping Page/assets/css/style.css">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <div class="brand-container">
+        <div class="account-dropdown-container" id="accountDropdown" tabindex="0" aria-haspopup="true" aria-expanded="false">
+          <svg class="account-icon" stroke="white" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="7" r="4"></circle>
+            <path d="M5.5 21c1.5-4 11-4 13 0"></path>
+          </svg>
+
+          <div class="dropdown-menu" id="dropdownMenu" role="menu">
+            <a href="#" role="menuitem">Profile</a>
+            <a href="#" role="menuitem">Logout</a>
+          </div>
+        </div>
+
+        <a href="index.html" class="brewha-text">BREW-HA</a>
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <a href="index.html">Home</a>
+      <a href="products.html">Menu</a>
+      <a href="order.html">Order</a>
+      <a href="about.html">About Us</a>
+      <a href="contact.html">Contact</a>
+      <a href="#" class="icon-link"><i class="fas fa-search"></i></a>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="shipping-page">
+    <section class="top-row">
+      <h1 class="page-label">Your order</h1>
+      <button class="help-btn" id="helpBtn" type="button">Help</button>
+    </section>
+
+    <section class="logo-area">
+      <div class="logo-box" id="merchantLogoBox">
+        <img id="merchantLogo" src="" alt="Store Logo" hidden>
+        <span id="merchantLogoFallback">LOGO</span>
+      </div>
+    </section>
+
+    <section class="status-area">
+      <p class="delivery-label">Estimated delivery time</p>
+      <h2 class="delivery-time" id="estimatedTime">Time</h2>
+
+      <div class="progress-track">
+        <div class="progress-step active"></div>
+        <div class="progress-step active"></div>
+        <div class="progress-step"></div>
+        <div class="progress-step"></div>
+      </div>
+
+      <p class="status-text" id="shippingStatusText">
+        Preparing your food. Your rider will pick it up once it’s ready
+      </p>
+    </section>
+
+    <section class="rider-card">
+      <div class="rider-left">
+        <div class="rider-avatar" id="riderAvatar">Logo</div>
+        <div class="rider-info">
+          <h3>Contact your rider</h3>
+          <p>Ask for contactless delivery</p>
+        </div>
+      </div>
+
+      <button class="chat-btn" id="contactRiderBtn" type="button" aria-label="Contact your rider">
+        <i class="fas fa-comments"></i>
+      </button>
+    </section>
+
+    <section class="order-card">
+      <div class="order-header">
+        <h3>Your order from</h3>
+        <p id="deliveryModeText">(the delivery place)</p>
+      </div>
+
+      <div class="order-items" id="orderItems">
+        <!-- Dynamic items -->
+      </div>
+
+      <div class="order-divider"></div>
+
+      <div class="order-summary-line">
+        <span>Subtotal</span>
+        <span id="subtotalAmount">₱0</span>
+      </div>
+
+      <div class="order-summary-line">
+        <span>Delivery fee</span>
+        <span id="deliveryFeeAmount">₱0</span>  
+      </div>
+
+      <div class="order-summary-line total-line">
+        <span>Total</span>
+        <span id="totalAmount">₱0</span>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-top-row">
+      <div class="footer-brewha">BREW-HA</div>
+    </div>
+
+    <div class="footer-divider"></div>
+
+    <div class="footer-bottom-row">
+      <div class="footer-copyright">© 2025 All Rights Reserved</div>
+
+      <div class="footer-social">
+        <span>Follow Us</span>
+        <a href="https://www.facebook.com" target="_blank" aria-label="Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+        <a href="https://www.instagram.com" target="_blank" aria-label="Instagram">
+          <i class="fab fa-instagram"></i>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- HELP MODAL -->
+  <div class="modal-overlay" id="helpModal">
+    <div class="modal-box">
+      <button class="modal-close" id="closeHelpModal" type="button">&times;</button>
+      <h3>Need help?</h3>
+      <p>You can contact support or your rider for delivery concerns.</p>
+      <div class="modal-actions">
+        <button type="button" id="supportBtn">Contact Support</button>
+        <button type="button" id="modalRiderBtn">Contact Rider</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../Shipping Page/assets/js/scripts.js"></script>
+</body>
+</html>
