@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brew-Ha · Profile</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Stardos+Stencil:wght@700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <nav>
+    <div class="nav-left">
+      <div class="brand-container">
+        <div class="account-dropdown-container" id="accountDropdown">
+          <svg class="account-icon" stroke="white" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="7" r="4" />
+            <path d="M5.5 21c1.5-4 11-4 13 0" />
+          </svg>
+          <div class="dropdown-menu" id="dropdownMenu">
+            <a href="#">Logout</a>
+          </div>
+        </div>
+        <a href="index.html" class="brewha-text">BREW-HA</a>
+      </div>
+    </div>
+    <div class="nav-right">
+        <a href="index.html" class="active">Home</a>
+        <a href="./pages/Product Catalog Page/index.html">Menu</a>
+        <a href="./pages/Cart Page/index.html">Order</a>
+        <a href="./pages/About Us Page/index.html">About Us</a>
+        <a href="./pages/Contact Page/index.html">Contact</a>
+    </div>
+  </nav>
+
+  <!-- PROFILE MAIN CONTENT -->
+  <main class="profile-main">
+
+    <div class="greeting-row">
+      <h1>Hi!</h1>
+      <span class="username" id="usernameDisplay">Loading...</span>
+    </div>
+    <div class="welcome-sub">Welcome to your user profile!</div>
+
+    <!-- MY PURCHASES section (carousel) -->
+    <div class="section-header">
+      <h2>MY PURCHASES</h2>
+      <p>your recent orders</p>
+    </div>
+
+    <div class="carousel-wrapper">
+      <button class="nav-arrow" onclick="ProfileUI.scrollPurchases('left')"><i class="fas fa-chevron-left"></i></button>
+      <div class="carousel-container" id="purchasesCarousel">
+        <!-- Purchases will be dynamically loaded here -->
+        <div class="loading-message">Loading purchases...</div>
+      </div>
+      <button class="nav-arrow" onclick="ProfileUI.scrollPurchases('right')"><i class="fas fa-chevron-right"></i></button>
+    </div>
+    <div class="pagination-dots" id="purchasesPagination">
+      <!-- Pagination dots will be dynamically generated -->
+    </div>
+
+    <!-- MY LIKES section with filter chips (Drinks, Pastry, Pasta) -->
+    <div class="section-header" style="margin-top: 40px;">
+      <h2>MY LIKES</h2>
+    </div>
+
+    <!-- filter chips (no Sort by Price) -->
+    <div class="filter-row" id="filterRow">
+      <span class="filter-chip active" data-filter="all">All</span>
+      <span class="filter-chip" data-filter="Drinks">Drinks</span>
+      <span class="filter-chip" data-filter="Pastry">Pastry</span>
+      <span class="filter-chip" data-filter="Pasta">Pasta</span>
+    </div>
+
+    <!-- likes carousel (items will be filtered via JS) -->
+    <div class="carousel-wrapper">
+      <button class="nav-arrow" onclick="ProfileUI.scrollLikes('left')"><i class="fas fa-chevron-left"></i></button>
+      <div class="carousel-container" id="likesCarousel">
+        <!-- Likes will be dynamically loaded here -->
+        <div class="loading-message">Loading likes...</div>
+      </div>
+      <button class="nav-arrow" onclick="ProfileUI.scrollLikes('right')"><i class="fas fa-chevron-right"></i></button>
+    </div>
+
+    <!-- LOG OUT row -->
+    <div class="logout-row">
+      <span class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> LOG OUT</span>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top-row">
+      <div class="footer-brewha">BREW-HA</div>
+    </div>
+    <div class="footer-divider"></div>
+    <div class="footer-bottom-row">
+      <div class="footer-copyright">© 2026 All Rights Reserved</div>
+      <div class="footer-social">
+        <span>Follow Us</span>
+        <a href="https://www.facebook.com" target="_blank">
+          <svg class="footer-social-icon" viewBox="0 0 24 24">
+            <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.877v-6.987h-2.54v-2.89h2.54v-2.205c0-2.507 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.463h-1.26c-1.243 0-1.63.771-1.63 1.562v1.875h2.773l-.443 2.89h-2.33v6.987C18.343 21.128 22 16.991 22 12z"/>
+          </svg>
+        </a>
+        <a href="https://www.instagram.com" target="_blank">
+          <svg class="footer-social-icon" viewBox="0 0 24 24">
+            <path d="M7.75 2A5.75 5.75 0 002 7.75v8.5A5.75 5.75 0 007.75 22h8.5A5.75 5.75 0 0022 16.25v-8.5A5.75 5.75 0 0016.25 2h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm5.25-1.5a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0zM12 9a3 3 0 100 6 3 3 0 000-6z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/api-service.js"></script>
+  <script src="assets/js/profile-ui.js"></script>
+  <script src="assets/js/script.js"></script>
+</body>
+</html>
