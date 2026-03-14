@@ -1,0 +1,421 @@
+
+* {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body, html {
+      height: 100%;
+      background-color: #faf7f3;
+      font-family: 'Quicksand', sans-serif;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ---------- NAVBAR---------- */
+    nav {
+      background-color: #652e1e;
+      height: 70px;
+      padding: 0 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+      user-select: none;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      z-index: 20;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-container {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* account icon */
+    .account-dropdown-container {
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    .account-icon {
+      width: 36px;
+      height: 36px;
+      stroke: white;
+      stroke-width: 2;
+      fill: none;
+      border-radius: 50%;
+      border: 2px solid white;
+      padding: 4px;
+      box-sizing: content-box;
+      transition: transform 0.2s ease, border-color 0.2s;
+    }
+
+    .account-icon:hover {
+      transform: scale(1.05);
+      border-color: #e6dbce;
+    }
+    .brewha-text {
+      font-family: 'Stardos Stencil', cursive;
+      font-weight: 700;
+      font-size: 2.4rem;
+      letter-spacing: 0.12em;
+      color: white;
+      line-height: 1;
+      text-transform: uppercase;
+      text-shadow: 2px 2px 0 #3d1c12;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 52px;
+      left: 0;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3), 0 5px 15px rgba(0, 0, 0, 0.2);
+      min-width: 160px;
+      display: none;
+      flex-direction: column;
+      z-index: 30;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #652e1e;
+      overflow: hidden;
+      border: none;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dropdown-menu.show {
+      display: flex;
+    }
+
+    .dropdown-menu a {
+      padding: 14px 24px;
+      text-align: left;
+      transition: all 0.2s;
+      color: #652e1e;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      border-bottom: 1px solid #f0e8dd;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dropdown-menu a:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-menu a:hover {
+      background-color: #652e1e;
+      color: white;
+      text-decoration: none;
+      padding-left: 30px;
+    }
+
+    .dropdown-menu a::before {
+      content: "↪";
+      font-size: 1.2rem;
+      opacity: 0.7;
+      transition: transform 0.2s;
+    }
+
+    .dropdown-menu a:hover::before {
+      transform: translateX(3px);
+      color: white;
+    }
+
+    .account-dropdown-container::after {
+      content: '';
+      position: absolute;
+      top: 42px;
+      left: 15px;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 8px solid #ffffff;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 31;
+      pointer-events: none;
+    }
+
+    .account-dropdown-container.show-logout::after {
+      opacity: 1;
+    }
+
+    .nav-right {
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: flex;
+      gap: 36px;
+      align-items: center;
+    }
+    .nav-right a.login-link {
+      text-decoration: underline;
+      text-underline-offset: 6px;
+    }
+
+    .nav-right a:hover {
+      color: #e6dbce;
+    }
+
+    /* ---------- MAIN (login form) ---------- */
+    main {
+      min-height: calc(100vh - 70px - 140px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .login-form {
+      background-color: #6a7053;
+      width: 380px;
+      padding: 32px 36px 40px;
+      border-radius: 60px;
+      box-shadow: 0 16px 28px rgba(0,0,0,0.3);
+      color: white;
+    }
+
+    .login-form h2 {
+      font-weight: 500;
+      font-size: 2rem;
+      margin: 0 0 25px 0;
+      text-align: center;
+    }
+    .input-group {
+      display: flex;
+      align-items: center;
+      background: white;
+      border-radius: 50px;
+      margin-bottom: 20px;
+      padding: 0 15px;
+    }
+
+    .input-group .material-icons {
+      color: #6a7053;
+      font-size: 22px;
+      margin-right: 10px;
+    }
+
+    .input-group input {
+      flex: 1;
+      border: none;
+      padding: 16px 0;
+      font-size: 1rem;
+      font-family: 'Quicksand', sans-serif;
+      outline: none;
+      background: transparent;
+      color: #333;
+    }
+
+    .input-group input::placeholder {
+      color: #999;
+    }
+
+    /* Password toggle button */
+    .password-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      color: #6a7053;
+      padding: 0;
+    }
+
+    .password-toggle .material-icons {
+      margin-right: 0;
+      font-size: 22px;
+    }
+
+    /* Login button */
+    .login-btn {
+      width: 100%;
+      background-color: #e6dbce;
+      color: #652e1e;
+      font-weight: 700;
+      font-size: 1rem;
+      border: none;
+      border-radius: 50px;
+      padding: 16px 0;
+      cursor: pointer;
+      letter-spacing: 0.12em;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      text-transform: uppercase;
+      margin: 10px 0 20px;
+    }
+
+    .login-btn:hover {
+      background-color: #d7ccb8;
+    }
+
+    .or-text {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #e6dbce;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 20px;
+    }
+
+    .social-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      font-weight: 600;
+      font-size: 1rem;
+      color: white;
+      margin-bottom: 25px;
+    }
+
+    .social-button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 10px;
+    }
+
+    .facebook-icon {
+      background: #1877f2;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+    }
+
+    .facebook-icon svg {
+      fill: white;
+      width: 18px;
+      height: 18px;
+    }
+
+    .google-icon svg {
+      width: 30px;
+      height: 30px;
+      display: block;
+    }
+
+    /* No account section */
+    .no-account {
+      text-align: center;
+      font-size: 0.95rem;
+      color: #e6dbce;
+      margin-top: 5px;
+    }
+
+    .no-account a {
+      font-weight: 700;
+      color: white;
+      margin-left: 5px;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .no-account a:hover {
+      color: #d7ccb8;
+    }
+
+    /* ---------- FOOTER ---------- */
+    footer {
+      background-color: #6a7053;
+      color: white;
+      height: 140px;
+      border-radius: 60px 60px 0 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 18px 48px 20px;
+      border-top: 3px solid #8a8f6e;
+    }
+
+    .footer-top-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 6px;
+    }
+
+    .footer-brewha {
+      font-family: 'Stardos Stencil', cursive;
+      font-weight: 700;
+      font-size: 1.8rem;
+      letter-spacing: 0.12em;
+      color: white;
+      text-shadow: 2px 2px 0 #3d2c1e;
+    }
+
+    .footer-divider {
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, #c4c1b0, #ffffff, #c4c1b0);
+      margin: 8px 0 14px 0;
+      border-radius: 3px;
+    }
+
+    .footer-bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-copyright {
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: #e6dbce;
+    }
+
+    .footer-social {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .footer-social span {
+      margin-right: 2px;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .footer-social-icon {
+      width: 26px;
+      height: 26px;
+      fill: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .footer-social-icon:hover {
+      fill: #cfc79e;
+      transform: scale(1.1);
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 20px; }
+      .brewha-text { font-size: 2rem; }
+      .nav-right { gap: 20px; }
+      footer { padding: 16px 24px; }
+      .footer-brewha { font-size: 1.5rem; }
+      .footer-bottom-row { flex-wrap: wrap; gap: 10px; }
+      .login-form { width: 320px; padding: 28px 25px 35px; }
+    }

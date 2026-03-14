@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brew-Ha Contact</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Stardos+Stencil:wght@700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<!-- NAVBAR-->
+<nav>
+    <div class="nav-left">
+        <div class="brand-container">
+            <div class="account-dropdown-container" id="accountDropdown" tabindex="0" aria-haspopup="true" aria-expanded="false">
+                <svg class="account-icon" stroke="white" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="7" r="4" />
+                    <path d="M5.5 21c1.5-4 11-4 13 0" />
+                </svg>
+                <div class="dropdown-menu" id="dropdownMenu" role="menu">
+                    <a href="#" role="menuitem">Logout</a>
+                </div>
+            </div>
+            <a href="index.html" class="brewha-text">BREW-HA</a>
+        </div>
+    </div>
+
+    <div class="nav-right">
+        <a href="index.html">Home</a>
+        <a href="products.html">Menu</a>
+        <a href="order.html">Order</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html" class="active">Contact</a>
+        <a href="#" class="icon-link" id="searchIcon"><i class="fas fa-search"></i></a>
+    </div>
+</nav>
+
+<!-- Search Overlay -->
+<div class="search-overlay" id="searchOverlay">
+    <div class="search-header">
+        <input type="text" id="searchInput" placeholder="Search for anything... (coffee, pasta, location, contact)">
+        <button id="searchButton">Search</button>
+        <span class="close-search" id="closeSearch">&times;</span>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+</div>
+
+<h1 class="title">Contact Us!</h1>
+
+<div class="container">
+
+    <div class="form-card">
+        <h2><i class="material-icons">chat</i> Get In Touch</h2>
+
+        <div class="input-group">
+            <input class="input" id="name" placeholder="Your Name">
+        </div>
+
+        <div class="input-group">
+            <input class="input" id="email" placeholder="Email Address">
+        </div>
+
+        <div class="input-group">
+            <input class="input" id="topic" placeholder="Topic">
+        </div>
+
+        <div class="input-group">
+            <textarea class="input" id="message" placeholder="Your Message"></textarea>
+        </div>
+
+        <button class="send-btn" onclick="sendMessage()">SEND MESSAGE</button>
+    </div>
+
+    <!-- RIGHT INFO -->
+    <div class="info">
+        <div class="welcome-message">
+            <h3><i class="material-icons">handshake</i> We'd Love to Hear From You!</h3>
+            <p>Looking to connect? We'd be thrilled to hear from you. Here's how you can reach us - whether you have a question about our menu, want to provide feedback, or just want to say hello, our team is always ready to assist. Drop us a message and we'll get back to you as soon as possible!</p>
+        </div>
+
+        <div class="contact-grid">
+            <div class="contact-box">
+                <span class="material-icons">phone</span>
+                <h4>Call Us</h4>
+                <p>+63 926 005 2555</p>
+                <p>Mon-Sat, 9am-9pm</p>
+            </div>
+
+            <div class="contact-box">
+                <span class="material-icons">email</span>
+                <h4>Email Us</h4>
+                <p>brewha@gmail.com</p>
+                <p>24/7 Support</p>
+            </div>
+
+            <div class="contact-box">
+                <span class="material-icons">location_on</span>
+                <h4>Visit Us</h4>
+                <p>Manila, Philippines</p>
+                <p>FEU Tech Campus</p>
+            </div>
+        </div>
+
+        <div class="map">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3860.492166279571!2d120.98953431526533!3d14.609019980092067!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397b5f2b2e5b2e5%3A0x2b2e5b2e5b2e5b2e!2sFEU%20Institute%20of%20Technology!5e0!3m2!1sen!2sph!4v1620000000000!5m2!1sen!2sph"
+                width="100%"
+                height="100%"
+                style="border:0;"
+                allowfullscreen=""
+                loading="lazy">
+            </iframe>
+        </div>
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-top-row">
+        <div class="footer-brewha">BREW-HA</div>
+    </div>
+    <div class="footer-divider"></div>
+    <div class="footer-bottom-row">
+        <div class="footer-copyright">© 2026 All Rights Reserved</div>
+        <div class="footer-social">
+            <span>Follow Us</span>
+            <a href="https://www.facebook.com" target="_blank">
+                <svg class="footer-social-icon" viewBox="0 0 24 24">
+                    <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.877v-6.987h-2.54v-2.89h2.54v-2.205c0-2.507 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.463h-1.26c-1.243 0-1.63.771-1.63 1.562v1.875h2.773l-.443 2.89h-2.33v6.987C18.343 21.128 22 16.991 22 12z"/>
+                </svg>
+            </a>
+            <a href="https://www.instagram.com" target="_blank">
+                <svg class="footer-social-icon" viewBox="0 0 24 24">
+                    <path d="M7.75 2A5.75 5.75 0 002 7.75v8.5A5.75 5.75 0 007.75 22h8.5A5.75 5.75 0 0022 16.25v-8.5A5.75 5.75 0 0016.25 2h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm5.25-1.5a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0zM12 9a3 3 0 100 6 3 3 0 000-6z"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</footer>
+
+<script src="assets/js/script.js"></script>
+</body>
+</html>

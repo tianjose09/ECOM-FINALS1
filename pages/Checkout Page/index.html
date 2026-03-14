@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brew-Ha Checkout</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Stardos+Stencil:wght@700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+    <div class="nav-left">
+        <div class="brand-container">
+            <div class="account-dropdown-container" id="accountDropdown" tabindex="0" aria-haspopup="true" aria-expanded="false">
+                <svg class="account-icon" stroke="white" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="7" r="4" />
+                    <path d="M5.5 21c1.5-4 11-4 13 0" />
+                </svg>
+                <div class="dropdown-menu" id="dropdownMenu" role="menu">
+                    <a href="#" role="menuitem">Logout</a>
+                </div>
+            </div>
+            <a href="index.html" class="brewha-text">BREW-HA</a>
+        </div>
+    </div>
+    <div class="nav-right">
+        <a href="index.html">Home</a>
+        <a href="PRODUCT_CATALOG.html">Menu</a>
+        <a href="order.html" class="active">Order</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact</a>
+        <a href="#" class="icon-link" id="searchIcon"><i class="fas fa-search"></i></a>
+    </div>
+</nav>
+
+<!-- Search Overlay -->
+<div class="search-overlay" id="searchOverlay">
+    <div class="search-header">
+        <input type="text" id="searchInput" placeholder="Search for products...">
+        <button id="searchButton">Search</button>
+        <span class="close-search" id="closeSearch">&times;</span>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+</div>
+
+<!-- Payment Modal -->
+<div class="payment-modal-overlay" id="paymentModal">
+    <div class="payment-modal">
+        <i class="fas fa-credit-card"></i>
+        <h2>Complete Payment</h2>
+        <p id="paymentModalMessage">You will be redirected to complete your payment.</p>
+        <div class="payment-amount" id="paymentAmount">₱0.00</div>
+        <div class="payment-modal-buttons">
+            <button onclick="closePaymentModal()">Cancel</button>
+            <button class="proceed-btn" id="proceedPaymentBtn" onclick="proceedToPayment()">Pay Now</button>
+        </div>
+    </div>
+</div>
+
+<!-- ORDER CONFIRMATION MODAL -->
+<div class="confirmation-modal-overlay" id="confirmationModal">
+    <div class="confirmation-modal">
+        <span class="confirmation-close" onclick="closeConfirmationModal()">&times;</span>
+        <div class="confirmation-header">
+            <i class="fas fa-check-circle"></i>
+            <h2>Thank You!</h2>
+            <p>Your order has been placed</p>
+        </div>
+
+        <div class="confirmation-body">
+            <div class="confirmation-location" id="confirmationLocation"></div>
+
+            <button class="confirmation-btn" onclick="continueShopping()">
+                <i class="fas fa-shopping-bag"></i> Continue Shopping
+            </button>
+        </div>
+    </div>
+</div>
+
+<h1 class="title">Checkout & Payment</h1>
+
+<div class="container">
+
+    <div class="left">
+        <h2><i class="fas fa-map-marker-alt"></i> Delivery Options</h2>
+
+        <div class="map-container">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3860.492166279571!2d120.98953431526533!3d14.609019980092067!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397b5f2b2e5b2e5%3A0x2b2e5b2e5b2e5b2e!2sFEU%20Institute%20of%20Technology!5e0!3m2!1sen!2sph!4v1620000000000!5m2!1sen!2sph"
+                width="100%"
+                height="100%"
+                style="border:0;"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </div>
+
+        <div class="delivery-options">
+            <label class="delivery-option" id="pickupOption" onclick="selectDeliveryMethod('pickup')">
+                <input type="radio" name="deliveryMethod" value="pickup" checked>
+                <i class="fas fa-store"></i>
+                <span>Pickup</span>
+            </label>
+
+            <label class="delivery-option" id="deliveryOption" onclick="selectDeliveryMethod('delivery')">
+                <input type="radio" name="deliveryMethod" value="delivery">
+                <i class="fas fa-truck"></i>
+                <span>Delivery</span>
+            </label>
+        </div>
+
+        <div id="pickupAddress" style="margin-bottom: 15px;">
+            <input class="input" id="pickupLocation" value="Brew-Ha Kitchen, P. Paredes St., Sampaloc, Manila" readonly style="background: #e9e4e1;">
+        </div>
+
+        <div class="address-fields" id="deliveryFields">
+            <h3><i class="fas fa-map-pin"></i> Enter Delivery Address</h3>
+            <input class="input" id="houseNumber" placeholder="House/Lot/Unit Number, Building Name">
+            <input class="input" id="street" placeholder="Street Name">
+            <input class="input" id="barangay" placeholder="Barangay/District">
+            <input class="input" id="city" placeholder="City/Municipality">
+            <input class="input" id="province" placeholder="Province">
+            <input class="input" id="zipCode" placeholder="Zip Code">
+        </div>
+
+        <div class="delivery-fee-info" id="deliveryFeeInfo">
+            <i class="fas fa-info-circle"></i>
+            <span id="deliveryFeeText">Standard delivery fee: ₱40</span>
+        </div>
+
+        <h3 class="section-title"><i class="fas fa-credit-card"></i> Saved payment methods</h3>
+
+        <label class="payment-option" onclick="selectPayment('GCash', 'https://www.gcash.com', this)">
+            <input type="radio" name="payment" value="GCash">
+            <img src="gcash.png" alt="GCash">
+            Gcash
+            <span class="external-link-icon"><i class="fas fa-external-link-alt"></i></span>
+        </label>
+
+        <label class="payment-option" onclick="selectPayment('Mastercard', 'https://www.mastercard.com', this)">
+            <input type="radio" name="payment" value="Mastercard">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+            Mastercard
+            <span class="external-link-icon"><i class="fas fa-external-link-alt"></i></span>
+        </label>
+
+        <label class="payment-option" onclick="selectPayment('Visa', 'https://www.visa.com', this)">
+            <input type="radio" name="payment" value="Visa">
+            <img src="visa.png" alt="Visa">
+            Visa
+            <span class="external-link-icon"><i class="fas fa-external-link-alt"></i></span>
+        </label>
+
+        <h3 class="section-title"><i class="fas fa-money-bill-wave"></i> Other payment methods</h3>
+
+        <label class="payment-option" onclick="selectPayment('COD', null, this)">
+            <input type="radio" name="payment" value="COD">
+            <i class="fas fa-money-bill" style="font-size: 24px; color: #2d2d2d;"></i> Cash on delivery
+        </label>
+
+        <div class="consent">
+            <input type="checkbox" id="agree">
+            <div>
+                I hereby give brewha the permission to share my customer data with the Restaurant for service improvement and marketing purposes.
+            </div>
+        </div>
+
+        <button class="order-btn" onclick="validateAndShowPayment()">Place Order</button>
+    </div>
+
+    <div class="summary">
+        <h2><i class="fas fa-shopping-bag"></i> Your order from</h2>
+        <small>BREW-HA Kitchen</small>
+
+        <div id="orderItems"></div>
+
+        <div class="line"></div>
+
+        <div class="item">
+            <span>Subtotal</span>
+            <span>₱ <span id="subtotal">0</span></span>
+        </div>
+
+        <div class="item" id="deliveryFeeRow">
+            <span>Delivery fee</span>
+            <span>₱ <span id="deliveryFee">0</span></span>
+        </div>
+
+        <div class="total">
+            <span>Total</span>
+            <span>₱ <span id="total">0</span></span>
+        </div>
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-top-row">
+        <div class="footer-brewha">BREW-HA</div>
+    </div>
+    <div class="footer-divider"></div>
+    <div class="footer-bottom-row">
+        <div class="footer-copyright">© 2026 All Rights Reserved</div>
+        <div class="footer-social">
+            <span>Follow Us</span>
+            <a href="https://www.facebook.com" target="_blank">
+                <svg class="footer-social-icon" viewBox="0 0 24 24">
+                    <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.877v-6.987h-2.54v-2.89h2.54v-2.205c0-2.507 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.463h-1.26c-1.243 0-1.63.771-1.63 1.562v1.875h2.773l-.443 2.89h-2.33v6.987C18.343 21.128 22 16.991 22 12z"/>
+                </svg>
+            </a>
+            <a href="https://www.instagram.com" target="_blank">
+                <svg class="footer-social-icon" viewBox="0 0 24 24">
+                    <path d="M7.75 2A5.75 5.75 0 002 7.75v8.5A5.75 5.75 0 007.75 22h8.5A5.75 5.75 0 0022 16.25v-8.5A5.75 5.75 0 0016.25 2h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm5.25-1.5a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0zM12 9a3 3 0 100 6 3 3 0 000-6z"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</footer>
+
+<script src="assets/js/script.js"></script>
+</body>
+</html>
