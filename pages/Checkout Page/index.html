@@ -12,7 +12,6 @@
 </head>
 <body>
 
-<!-- NAVBAR -->
 <nav>
     <div class="nav-left">
         <div class="brand-container">
@@ -25,19 +24,19 @@
                     <a href="#" role="menuitem">Logout</a>
                 </div>
             </div>
-            <a href="index.html" class="brewha-text">BREW-HA</a>
+            <a href="/index.html" class="brewha-text">BREW-HA</a>
         </div>
     </div>
     <div class="nav-right">
-        <a href="/index.html" class="active">Home</a>
+        <a href="/index.html">Home</a>
         <a href="../Product Catalog Page/index.html">Menu</a>
-        <a href="../Cart Page/index.html">Order</a>
+        <a href="../Cart Page/index.html" class="active">Order</a>
         <a href="../About us Page/index.html">About Us</a>
         <a href="../Contact Page/index.html">Contact</a>
+        <a href="#" class="icon-link" id="searchIcon"><i class="fas fa-search"></i></a>
     </div>
 </nav>
 
-<!-- Search Overlay -->
 <div class="search-overlay" id="searchOverlay">
     <div class="search-header">
         <input type="text" id="searchInput" placeholder="Search for products...">
@@ -47,7 +46,6 @@
     <div class="search-results" id="searchResults"></div>
 </div>
 
-<!-- Payment Modal -->
 <div class="payment-modal-overlay" id="paymentModal">
     <div class="payment-modal">
         <i class="fas fa-credit-card"></i>
@@ -57,26 +55,6 @@
         <div class="payment-modal-buttons">
             <button onclick="closePaymentModal()">Cancel</button>
             <button class="proceed-btn" id="proceedPaymentBtn" onclick="proceedToPayment()">Pay Now</button>
-        </div>
-    </div>
-</div>
-
-<!-- ORDER CONFIRMATION MODAL -->
-<div class="confirmation-modal-overlay" id="confirmationModal">
-    <div class="confirmation-modal">
-        <span class="confirmation-close" onclick="closeConfirmationModal()">&times;</span>
-        <div class="confirmation-header">
-            <i class="fas fa-check-circle"></i>
-            <h2>Thank You!</h2>
-            <p>Your order has been placed</p>
-        </div>
-
-        <div class="confirmation-body">
-            <div class="confirmation-location" id="confirmationLocation"></div>
-
-            <button class="confirmation-btn" onclick="continueShopping()">
-                <i class="fas fa-shopping-bag"></i> Continue Shopping
-            </button>
         </div>
     </div>
 </div>
@@ -136,8 +114,8 @@
 
         <label class="payment-option" onclick="selectPayment('GCash', 'https://www.gcash.com', this)">
             <input type="radio" name="payment" value="GCash">
-            <img src="gcash.png" alt="GCash">
-            Gcash
+            <img src="../Checkout Page/assets/img/gcash.png" alt="GCash">
+            GCash
             <span class="external-link-icon"><i class="fas fa-external-link-alt"></i></span>
         </label>
 
@@ -150,7 +128,7 @@
 
         <label class="payment-option" onclick="selectPayment('Visa', 'https://www.visa.com', this)">
             <input type="radio" name="payment" value="Visa">
-            <img src="visa.png" alt="Visa">
+            <img src="../Checkout Page/assets/img/visa.png" alt="Visa">
             Visa
             <span class="external-link-icon"><i class="fas fa-external-link-alt"></i></span>
         </label>
@@ -198,7 +176,6 @@
 
 </div>
 
-<!-- FOOTER -->
 <footer>
     <div class="footer-top-row">
         <div class="footer-brewha">BREW-HA</div>

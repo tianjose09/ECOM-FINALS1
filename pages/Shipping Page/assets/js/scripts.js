@@ -1,66 +1,53 @@
-/*
-  BACKEND-READY SHIPPING PAGE
-  ---------------------------------
-  This script is prepared so you can later replace the sampleData
-  with API data from PHP, Node, Laravel, or any backend.
-
-  Example future backend flow:
-  1. fetch('/api/order/current')
-  2. receive JSON
-  3. call renderShippingPage(data)
-*/
-
-const sampleShippingData = {
-  orderId: "ORD-10025",
-  merchant: {
-    name: "BREW-HA",
-    logo: "", // put image path here later if available
-    pickupPlaceLabel: "Brew-Ha Kitchen, P. Paredes St., Sampaloc, Manila"
-  },
-  rider: {
-    name: "Juan Dela Cruz",
-    phone: "09123456789"
-  },
-  shipping: {
-    estimatedTimeText: "18 - 25 mins",
-    currentStage: 2,
-    statusMessage: "Preparing your food. Your rider will pick it up once it’s ready",
-    deliveryModeLabel: "(Brew-Ha Kitchen)"
-  },
-  pricing: {
-    subtotal: 395,
-    deliveryFee: 49,
-    total: 444
-  },
-  items: [
-    {
-      name: "Iced Caramel Macchiato",
-      quantity: 1,
-      price: 150,
-      meta: "Grande"
-    },
-    {
-      name: "Croissant",
-      quantity: 1,
-      price: 110,
-      meta: "Butter"
-    },
-    {
-      name: "Carbonara",
-      quantity: 1,
-      price: 135,
-      meta: "Regular"
-    }
-  ]
-};
+const API_BASE = '/api';
 
 document.addEventListener("DOMContentLoaded", () => {
   initializeDropdown();
   initializeHelpModal();
   initializeButtons();
-
-  renderShippingPage(sampleShippingData);
+  loadShippingFromBackend();
 });
+
+async function loadShippingFromBackend() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('order_id');
+
+    if (!orderId) {
+      renderEmptyShipping("No order selected.");
+      return;
+    }
+
+    const response = await fetch(`${API_BASE}/orders/shipping.php?order_id=${encodeURIComponent(orderId)}`);
+    const result = await response.json();
+
+    if (!result.success) {
+      renderEmptyShipping(result.error || "Order not found.");
+      return;
+    }
+
+    renderShippingPage(result.data);
+  } catch (error) {
+    console.error(error);
+    renderEmptyShipping("Failed to load shipping data.");
+  }
+}
+
+function renderEmptyShipping(message) {
+  document.getElementById("estimatedTime").textContent = "--";
+  document.getElementById("shippingStatusText").textContent = message;
+  document.getElementById("orderItems").innerHTML = `
+    <div class="order-item">
+      <div class="order-item-left">
+        <div class="order-item-name">No active order</div>
+        <div class="order-item-meta">${message}</div>
+      </div>
+      <div class="order-item-price">₱0</div>
+    </div>
+  `;
+  document.getElementById("subtotalAmount").textContent = "₱0";
+  document.getElementById("deliveryFeeAmount").textContent = "₱0";
+  document.getElementById("totalAmount").textContent = "₱0";
+}
 
 function initializeDropdown() {
   const accountDropdown = document.getElementById("accountDropdown");
@@ -117,19 +104,19 @@ function initializeButtons() {
 
   if (contactRiderBtn) {
     contactRiderBtn.addEventListener("click", () => {
-      alert("Rider contact feature will be connected to backend or chat service.");
+      alert("Rider contact will be connected later.");
     });
   }
 
   if (modalRiderBtn) {
     modalRiderBtn.addEventListener("click", () => {
-      alert("Opening rider contact soon.");
+      alert("Rider contact will be connected later.");
     });
   }
 
   if (supportBtn) {
     supportBtn.addEventListener("click", () => {
-      alert("Support feature will be connected to backend.");
+      alert("Support will be connected later.");
     });
   }
 }
@@ -164,17 +151,9 @@ function renderShippingStatus(shipping) {
   const deliveryModeText = document.getElementById("deliveryModeText");
   const steps = document.querySelectorAll(".progress-step");
 
-  if (estimatedTime) {
-    estimatedTime.textContent = shipping.estimatedTimeText || "Time";
-  }
-
-  if (shippingStatusText) {
-    shippingStatusText.textContent = shipping.statusMessage || "";
-  }
-
-  if (deliveryModeText) {
-    deliveryModeText.textContent = shipping.deliveryModeLabel || "(Delivery location)";
-  }
+  estimatedTime.textContent = shipping.estimatedTimeText || "Time";
+  shippingStatusText.textContent = shipping.statusMessage || "";
+  deliveryModeText.textContent = shipping.deliveryModeLabel || "(Delivery location)";
 
   steps.forEach((step, index) => {
     if (index < (shipping.currentStage || 0)) {
@@ -220,13 +199,9 @@ function renderOrderItems(items) {
 }
 
 function renderPricing(pricing) {
-  const subtotalAmount = document.getElementById("subtotalAmount");
-  const deliveryFeeAmount = document.getElementById("deliveryFeeAmount");
-  const totalAmount = document.getElementById("totalAmount");
-
-  if (subtotalAmount) subtotalAmount.textContent = formatPeso(pricing.subtotal || 0);
-  if (deliveryFeeAmount) deliveryFeeAmount.textContent = formatPeso(pricing.deliveryFee || 0);
-  if (totalAmount) totalAmount.textContent = formatPeso(pricing.total || 0);
+  document.getElementById("subtotalAmount").textContent = formatPeso(pricing.subtotal || 0);
+  document.getElementById("deliveryFeeAmount").textContent = formatPeso(pricing.deliveryFee || 0);
+  document.getElementById("totalAmount").textContent = formatPeso(pricing.total || 0);
 }
 
 function formatPeso(value) {
@@ -241,24 +216,3 @@ function escapeHtml(value) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
-
-/*
-  FOR BACKEND INTEGRATION LATER:
-
-  Example:
-  async function loadShippingFromBackend() {
-    try {
-      const response = await fetch('/api/shipping/current');
-      const data = await response.json();
-      renderShippingPage(data);
-    } catch (error) {
-      console.error('Failed to load shipping data:', error);
-    }
-  }
-
-  Then replace:
-  renderShippingPage(sampleShippingData);
-
-  with:
-  loadShippingFromBackend();
-*/

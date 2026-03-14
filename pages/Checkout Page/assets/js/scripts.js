@@ -1,3 +1,5 @@
+const API_BASE = '/api';
+
 let cart = [];
 let subtotal = 0;
 let deliveryFee = 0;
@@ -5,23 +7,13 @@ let deliveryMethod = 'pickup';
 let selectedPaymentMethod = null;
 let selectedPaymentUrl = null;
 
-const paymentUrls = {
-    'GCash': 'https://www.gcash.com',
-    'Mastercard': 'https://www.mastercard.com',
-    'Visa': 'https://www.visa.com',
-    'COD': null
-};
-
-function loadCart() {
+async function loadCart() {
     try {
-        let savedCart = sessionStorage.getItem('checkoutCart');
+        const response = await fetch(`${API_BASE}/cart/get.php`);
+        const result = await response.json();
 
-        if (!savedCart) {
-            savedCart = localStorage.getItem('brewhaCart');
-        }
-
-        if (savedCart) {
-            cart = JSON.parse(savedCart);
+        if (result.success) {
+            cart = result.cart || [];
         } else {
             cart = [];
         }
@@ -44,7 +36,7 @@ function displayCart() {
         cart.forEach(item => {
             let itemDetails = '';
 
-            if (item.size && item.size !== 'Regular') {
+            if (item.size) {
                 itemDetails += `<div class="item-details">Size: ${item.size}</div>`;
             }
 
@@ -62,20 +54,21 @@ function displayCart() {
                     <span>${item.name} ${item.qty > 1 ? ' x' + item.qty : ''}</span>
                     ${itemDetails}
                 </div>
-                <span>₱ ${item.price * (item.qty || 1)}</span>
+                <span>₱ ${(item.price * (item.qty || 1)).toFixed(2)}</span>
             </div>
             `;
+
             subtotal += item.price * (item.qty || 1);
         });
     }
 
-    document.getElementById("subtotal").innerText = subtotal;
+    document.getElementById("subtotal").innerText = subtotal.toFixed(2);
     updateTotal();
 }
 
 function updateTotal() {
     const total = subtotal + deliveryFee;
-    document.getElementById("total").innerText = total;
+    document.getElementById("total").innerText = total.toFixed(2);
 }
 
 function selectDeliveryMethod(method) {
@@ -90,16 +83,15 @@ function selectDeliveryMethod(method) {
         document.getElementById('deliveryFeeInfo').style.display = 'none';
         deliveryFee = 0;
         document.getElementById('deliveryFee').innerText = '0';
-        updateTotal();
     } else {
         document.getElementById('deliveryOption').classList.add('selected');
         document.getElementById('deliveryFields').classList.add('show');
         document.getElementById('deliveryFeeInfo').style.display = 'block';
         deliveryFee = 40;
-        document.getElementById('deliveryFee').innerText = deliveryFee;
-        document.getElementById('deliveryFeeText').innerText = 'Standard delivery fee: ₱40';
-        updateTotal();
+        document.getElementById('deliveryFee').innerText = '40';
     }
+
+    updateTotal();
 }
 
 function selectPayment(method, url, element) {
@@ -113,94 +105,7 @@ function selectPayment(method, url, element) {
     element.classList.add('selected');
 
     const radio = element.querySelector('input[type="radio"]');
-    if (radio) {
-        radio.checked = true;
-    }
-}
-
-function validateAndShowPayment() {
-    if (deliveryMethod === 'delivery') {
-        let houseNumber = document.getElementById("houseNumber").value.trim();
-        let street = document.getElementById("street").value.trim();
-        let barangay = document.getElementById("barangay").value.trim();
-        let city = document.getElementById("city").value.trim();
-        let province = document.getElementById("province").value.trim();
-        let zipCode = document.getElementById("zipCode").value.trim();
-
-        if (houseNumber === "" || street === "" || barangay === "" || city === "" || province === "" || zipCode === "") {
-            alert("Please fill in all delivery address fields");
-            return;
-        }
-    }
-
-    if (!selectedPaymentMethod) {
-        alert("Please select payment method");
-        return;
-    }
-
-    let agree = document.getElementById("agree").checked;
-    if (!agree) {
-        alert("You must agree to the terms");
-        return;
-    }
-
-    if (cart.length === 0) {
-        alert("Your cart is empty!");
-        return;
-    }
-
-    const totalAmount = subtotal + deliveryFee;
-
-    if (selectedPaymentMethod === 'COD') {
-        placeOrder();
-        return;
-    }
-
-    const modal = document.getElementById('paymentModal');
-    const message = document.getElementById('paymentModalMessage');
-    const amountDisplay = document.getElementById('paymentAmount');
-
-    message.innerHTML = `You will be redirected to <strong>${selectedPaymentMethod}</strong> to complete your payment.`;
-    amountDisplay.innerHTML = `₱${totalAmount.toFixed(2)}`;
-
-    modal.style.display = 'flex';
-}
-
-function closePaymentModal() {
-    document.getElementById('paymentModal').style.display = 'none';
-}
-
-function proceedToPayment() {
-    const totalAmount = subtotal + deliveryFee;
-
-    if (selectedPaymentUrl) {
-        window.open(selectedPaymentUrl, '_blank');
-    }
-
-    closePaymentModal();
-
-    const order = {
-        orderNumber: 'ORD-' + Date.now(),
-        items: cart,
-        subtotal: subtotal,
-        deliveryFee: deliveryFee,
-        total: totalAmount,
-        paymentMethod: selectedPaymentMethod,
-        deliveryMethod: deliveryMethod,
-        address: deliveryMethod === 'delivery' ? getFullAddress() : 'Pickup at store',
-        orderDate: new Date().toISOString(),
-        status: 'Payment Pending'
-    };
-
-    let orderHistory = JSON.parse(localStorage.getItem('orderHistory')) || [];
-    orderHistory.push(order);
-    localStorage.setItem('orderHistory', JSON.stringify(orderHistory));
-
-    localStorage.removeItem('brewhaCart');
-    sessionStorage.removeItem('checkoutCart');
-    sessionStorage.removeItem('checkoutTotal');
-
-    showSimplifiedConfirmation(order);
+    if (radio) radio.checked = true;
 }
 
 function getFullAddress() {
@@ -211,62 +116,93 @@ function getFullAddress() {
     let province = document.getElementById("province").value.trim();
     let zipCode = document.getElementById("zipCode").value.trim();
 
-    return `${houseNumber} ${street}, ${barangay}, ${city}, ${province} ${zipCode}`;
+    return `${houseNumber} ${street}, ${barangay}, ${city}, ${province} ${zipCode}`.trim();
 }
 
-function placeOrder() {
-    const totalAmount = subtotal + deliveryFee;
-
-    const order = {
-        orderNumber: 'ORD-' + Date.now(),
-        items: cart,
-        subtotal: subtotal,
-        deliveryFee: deliveryFee,
-        total: totalAmount,
-        paymentMethod: selectedPaymentMethod,
-        deliveryMethod: deliveryMethod,
-        address: deliveryMethod === 'delivery' ? getFullAddress() : 'Pickup at store',
-        orderDate: new Date().toISOString(),
-        status: 'Confirmed'
-    };
-
-    let orderHistory = JSON.parse(localStorage.getItem('orderHistory')) || [];
-    orderHistory.push(order);
-    localStorage.setItem('orderHistory', JSON.stringify(orderHistory));
-
-    localStorage.removeItem('brewhaCart');
-    sessionStorage.removeItem('checkoutCart');
-    sessionStorage.removeItem('checkoutTotal');
-
-    showSimplifiedConfirmation(order);
-}
-
-function showSimplifiedConfirmation(order) {
-    const locationDiv = document.getElementById('confirmationLocation');
-
-    if (order.deliveryMethod === 'delivery') {
-        locationDiv.innerHTML = `
-            <h3><i class="fas fa-map-marker-alt"></i> Delivery Address</h3>
-            <p>${order.address}</p>
-            <p><small>Payment: ${order.paymentMethod}</small></p>
-        `;
-    } else {
-        locationDiv.innerHTML = `
-            <h3><i class="fas fa-store"></i> Pickup Location</h3>
-            <p>Brew-HA Kitchen, P. Paredes St., Sampaloc, Manila</p>
-            <p><small>Payment: ${order.paymentMethod}</small></p>
-        `;
+async function placeOrder() {
+    if (deliveryMethod === 'delivery') {
+        if (
+            !document.getElementById("houseNumber").value.trim() ||
+            !document.getElementById("street").value.trim() ||
+            !document.getElementById("barangay").value.trim() ||
+            !document.getElementById("city").value.trim() ||
+            !document.getElementById("province").value.trim() ||
+            !document.getElementById("zipCode").value.trim()
+        ) {
+            alert("Please fill in all delivery address fields");
+            return;
+        }
     }
 
-    document.getElementById('confirmationModal').style.display = 'flex';
+    if (!selectedPaymentMethod) {
+        alert("Please select payment method");
+        return;
+    }
+
+    if (!document.getElementById("agree").checked) {
+        alert("You must agree to the terms");
+        return;
+    }
+
+    if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE}/orders/place.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                payment_method: selectedPaymentMethod,
+                delivery_method: deliveryMethod,
+                delivery_fee: deliveryFee,
+                address: deliveryMethod === 'delivery' ? getFullAddress() : 'Pickup at store'
+            })
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            alert(result.error || 'Failed to place order');
+            return;
+        }
+
+        window.location.href = `../Shipping Page/index.html?order_id=${result.order_id}`;
+    } catch (error) {
+        console.error(error);
+        alert('Failed to connect to order API');
+    }
 }
 
-function closeConfirmationModal() {
-    document.getElementById('confirmationModal').style.display = 'none';
+function validateAndShowPayment() {
+    if (selectedPaymentMethod === 'COD') {
+        placeOrder();
+        return;
+    }
+
+    if (!selectedPaymentMethod) {
+        alert("Please select payment method");
+        return;
+    }
+
+    const totalAmount = subtotal + deliveryFee;
+    document.getElementById('paymentModalMessage').innerHTML =
+        `You will be redirected to <strong>${selectedPaymentMethod}</strong> to complete your payment.`;
+    document.getElementById('paymentAmount').innerText = `₱${totalAmount.toFixed(2)}`;
+    document.getElementById('paymentModal').style.display = 'flex';
 }
 
-function continueShopping() {
-    window.location.href = 'PRODUCT_CATALOG.html';
+function closePaymentModal() {
+    document.getElementById('paymentModal').style.display = 'none';
+}
+
+async function proceedToPayment() {
+    if (selectedPaymentUrl) {
+        window.open(selectedPaymentUrl, '_blank');
+    }
+    closePaymentModal();
+    await placeOrder();
 }
 
 function performSearch() {
@@ -280,22 +216,12 @@ function performSearch() {
         return;
     }
 
-    const products = [
-        { name: "Latte", price: 135, category: "drink", img: "latte.webp" },
-        { name: "Americano", price: 120, category: "drink", img: "americano.webp" },
-        { name: "Mocha", price: 140, category: "drink", img: "mocha.webp" },
-        { name: "Cappuccino", price: 125, category: "drink", img: "cappuccino.webp" },
-        { name: "Blueberry Juice", price: 140, category: "drink", img: "blueberry.png" },
-        { name: "Strawberry Smoothie", price: 150, category: "drink", img: "strawberry.png" },
-        { name: "Croissant", price: 110, category: "pastry", img: "croissant.png" },
-        { name: "Donut", price: 65, category: "pastry", img: "donut.png" },
-        { name: "Danish", price: 120, category: "pastry", img: "danish.png" },
-        { name: "Muffin", price: 70, category: "pastry", img: "muffin.png" },
-        { name: "Carbonara", price: 220, category: "pasta", img: "carbonara.png" },
-        { name: "Bolognese", price: 235, category: "pasta", img: "bolognese.png" },
-        { name: "Alfredo", price: 215, category: "pasta", img: "alfredo.png" },
-        { name: "Pesto", price: 255, category: "pasta", img: "pesto.png" }
-    ];
+    const products = cart.map(item => ({
+        name: item.name,
+        price: item.price,
+        category: item.category,
+        img: item.img
+    }));
 
     const results = products.filter(item =>
         item.name.toLowerCase().includes(query) ||
@@ -306,15 +232,10 @@ function performSearch() {
         resultsContainer.innerHTML = '<div class="no-results">No products found matching "' + query + '"</div>';
         resultsDiv.classList.add('has-results');
     } else {
-        resultsContainer.innerHTML = results.map(item => {
-            let section = 'drinks';
-            if (item.category === 'pastry') section = 'pastry';
-            else if (item.category === 'pasta') section = 'pasta';
-
-            return `
-            <div class="search-result-item" onclick="window.location.href='PRODUCT_CATALOG.html?section=${section}&product=${encodeURIComponent(item.name)}'">
+        resultsContainer.innerHTML = results.map(item => `
+            <div class="search-result-item">
                 <div class="result-info">
-                    <img src="${item.img}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/50x50?text=${item.name.charAt(0)}'">
+                    <img src="../Product Catalog Page/assets/img/${item.img}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/50x50?text=${encodeURIComponent(item.name.charAt(0))}'">
                     <div class="result-details">
                         <h4>${item.name}</h4>
                         <p>₱${item.price} | ${item.category}</p>
@@ -322,8 +243,7 @@ function performSearch() {
                 </div>
                 <i class="fas fa-arrow-right" style="color: #6f7551;"></i>
             </div>
-        `;
-        }).join('');
+        `).join('');
         resultsDiv.classList.add('has-results');
     }
 }
@@ -339,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const searchResults = document.querySelector('.search-results');
 
-    searchIcon.addEventListener('click', function(e) {
+    searchIcon?.addEventListener('click', function(e) {
         e.preventDefault();
         searchOverlay.style.display = 'flex';
         searchInput.focus();
@@ -348,22 +268,22 @@ document.addEventListener('DOMContentLoaded', function() {
         searchInput.value = '';
     });
 
-    closeSearch.addEventListener('click', function() {
+    closeSearch?.addEventListener('click', function() {
         searchOverlay.style.display = 'none';
         searchResults.classList.remove('has-results');
         document.getElementById('searchResults').innerHTML = '';
         searchInput.value = '';
     });
 
-    searchButton.addEventListener('click', performSearch);
+    searchButton?.addEventListener('click', performSearch);
 
-    searchInput.addEventListener('keypress', function(e) {
+    searchInput?.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             performSearch();
         }
     });
 
-    searchOverlay.addEventListener('click', function(e) {
+    searchOverlay?.addEventListener('click', function(e) {
         if (e.target === searchOverlay) {
             searchOverlay.style.display = 'none';
             searchResults.classList.remove('has-results');

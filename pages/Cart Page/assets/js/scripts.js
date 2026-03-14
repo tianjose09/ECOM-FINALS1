@@ -1,31 +1,35 @@
-// Cart data - starts empty, loads from localStorage
+const API_BASE = '/api';
+
 let cart = [];
 let currentFilter = 'all';
 
-// Load cart from localStorage
-function loadCart() {
-  const savedCart = localStorage.getItem('brewhaCart');
-  if (savedCart) {
-    cart = JSON.parse(savedCart);
-  } else {
+async function loadCart() {
+  try {
+    const response = await fetch(`${API_BASE}/cart/get.php`);
+    const result = await response.json();
+
+    if (result.success) {
+      cart = result.cart || [];
+    } else {
+      cart = [];
+    }
+
+    renderCart();
+  } catch (error) {
+    console.error(error);
     cart = [];
+    renderCart();
   }
-  renderCart();
 }
 
-// Save cart to localStorage
-function saveCart() {
-  localStorage.setItem('brewhaCart', JSON.stringify(cart));
-}
-
-// Filter function
 function filterCategory(category) {
   currentFilter = category;
   document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
 
   const buttons = document.querySelectorAll('.cat-btn');
   buttons.forEach(btn => {
-    if (btn.textContent.toLowerCase() === category || (category === 'all' && btn.textContent === 'All')) {
+    const text = btn.textContent.toLowerCase();
+    if (text === category || (category === 'all' && text === 'all')) {
       btn.classList.add('active');
     }
   });
@@ -50,18 +54,12 @@ function renderCart() {
   let total = 0;
 
   filteredCart.forEach((item) => {
-    const originalIndex = cart.findIndex(cartItem =>
-      cartItem.name === item.name &&
-      cartItem.size === item.size &&
-      cartItem.notes === item.notes
-    );
-
     let addonsHTML = "";
     if (item.addons && item.addons.length > 0) {
       addonsHTML = item.addons.map(a => `<div>• ${a}</div>`).join("");
     }
 
-    let imgTag = `<img src="${item.img}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/70x70?text=${item.name.charAt(0)}'">`;
+    let imgTag = `<img src="../Product Catalog Page/assets/img/${item.img}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/70x70?text=${encodeURIComponent(item.name.charAt(0))}'">`;
 
     cartContainer.innerHTML += `
       <div class="cart-item">
@@ -73,16 +71,14 @@ function renderCart() {
             ${item.notes ? `<br><small style="color: #666;">Note: ${item.notes}</small>` : ''}
           </div>
         </div>
-        <div class="addons">
-          ${addonsHTML}
-        </div>
+        <div class="addons">${addonsHTML}</div>
         <div class="price">₱ ${item.price}</div>
         <div class="qty-control">
-          <button class="qty-btn" onclick="decrease(${originalIndex})">-</button>
+          <button class="qty-btn" onclick="decrease(${item.id}, ${item.qty})">-</button>
           <span>${item.qty}</span>
-          <button class="qty-btn" onclick="increase(${originalIndex})">+</button>
+          <button class="qty-btn" onclick="increase(${item.id}, ${item.qty})">+</button>
         </div>
-        <div class="delete" onclick="removeItem(${originalIndex})">
+        <div class="delete" onclick="removeItem(${item.id})">
           <span class="material-icons">delete</span>
         </div>
       </div>
@@ -116,45 +112,56 @@ function renderCart() {
     cartFooter.style.display = 'none';
   }
 
-  document.getElementById("totalPrice").innerText = total;
+  document.getElementById("totalPrice").innerText = total.toFixed(2);
 }
 
-function increase(i) {
-  cart[i].qty++;
-  saveCart();
-  renderCart();
+async function increase(itemId, currentQty) {
+  await updateQty(itemId, currentQty + 1);
 }
 
-function decrease(i) {
-  if (cart[i].qty > 1) {
-    cart[i].qty--;
-    saveCart();
-    renderCart();
+async function decrease(itemId, currentQty) {
+  if (currentQty > 1) {
+    await updateQty(itemId, currentQty - 1);
   }
 }
 
-function removeItem(i) {
-  cart.splice(i, 1);
-  saveCart();
-  renderCart();
+async function updateQty(itemId, qty) {
+  try {
+    await fetch(`${API_BASE}/cart/update.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ item_id: itemId, qty })
+    });
+
+    await loadCart();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function removeItem(itemId) {
+  try {
+    await fetch(`${API_BASE}/cart/remove.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ item_id: itemId })
+    });
+
+    await loadCart();
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 function goToCheckoutPage() {
   if (cart.length === 0) {
-    const emptyMessage = document.createElement('div');
-    emptyMessage.className = 'empty-state';
-    emptyMessage.innerHTML = '<i class="fas fa-shopping-cart"></i><p>Your cart is empty!</p>';
-    document.querySelector('.cart-container').prepend(emptyMessage);
-    setTimeout(() => emptyMessage.remove(), 3000);
+    alert("Your cart is empty!");
     return;
   }
 
-  sessionStorage.setItem('checkoutCart', JSON.stringify(cart));
-  sessionStorage.setItem('checkoutTotal', document.getElementById("totalPrice").innerText);
-  window.location.href = 'checkout.html';
+  window.location.href = '../Checkout Page/index.html';
 }
 
-// Search functionality
 function performSearch() {
   const query = document.getElementById('searchInput').value.toLowerCase().trim();
   const resultsContainer = document.getElementById('searchResults');
@@ -176,9 +183,9 @@ function performSearch() {
     resultsDiv.classList.add('has-results');
   } else {
     resultsContainer.innerHTML = results.map(item => `
-      <div class="search-result-item" onclick="jumpToItem('${item.name}')">
+      <div class="search-result-item" onclick="jumpToItem('${item.name.replace(/'/g, "\\'")}')">
         <div class="result-info">
-          <img src="${item.img}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/50x50?text=${item.name.charAt(0)}'">
+          <img src="../Product Catalog Page/assets/img/${item.img}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/50x50?text=${encodeURIComponent(item.name.charAt(0))}'">
           <div class="result-details">
             <h4>${item.name} ${item.size ? `(${item.size})` : ''}</h4>
             <p>₱${item.price} | Qty: ${item.qty}</p>
@@ -224,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const searchInput = document.getElementById('searchInput');
   const searchResults = document.querySelector('.search-results');
 
-  searchIcon.addEventListener('click', function(e) {
+  searchIcon?.addEventListener('click', function(e) {
     e.preventDefault();
     searchOverlay.style.display = 'flex';
     searchInput.focus();
@@ -233,22 +240,22 @@ document.addEventListener('DOMContentLoaded', function() {
     searchInput.value = '';
   });
 
-  closeSearch.addEventListener('click', function() {
+  closeSearch?.addEventListener('click', function() {
     searchOverlay.style.display = 'none';
     searchResults.classList.remove('has-results');
     document.getElementById('searchResults').innerHTML = '';
     searchInput.value = '';
   });
 
-  searchButton.addEventListener('click', performSearch);
+  searchButton?.addEventListener('click', performSearch);
 
-  searchInput.addEventListener('keypress', function(e) {
+  searchInput?.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
       performSearch();
     }
   });
 
-  searchOverlay.addEventListener('click', function(e) {
+  searchOverlay?.addEventListener('click', function(e) {
     if (e.target === searchOverlay) {
       searchOverlay.style.display = 'none';
       searchResults.classList.remove('has-results');
@@ -267,7 +274,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.addEventListener('click', function(e) {
     if (!acc?.contains(e.target)) {
-      drop.classList.remove('show');
+      drop?.classList.remove('show');
     }
   });
 
