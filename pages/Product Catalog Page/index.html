@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BREW-HA - Product Catalog</title>
 
-<title>BREW-HA - Product Catalog</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Stardos+Stencil:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-<link rel="stylesheet" href="../Product Catalog Page/assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Stardos+Stencil:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 
@@ -32,142 +30,145 @@
     </div>
 
     <div class="nav-right">
-        <a href="../../index.html">Home</a>
-        <a href="products.html" class="register-link">Menu</a>
-        <a href="order.html">Order</a>
-        <a href="about.html">About Us</a>
-        <a href="contact.html">Contact</a>
-        <a href="cart.html" class="icon-link" id="cartLink">
-          <div class="cart-icon-container">
-            <i class="fas fa-shopping-cart"></i>
-            <span class="cart-badge" id="cartBadge">0</span>
-          </div>
+        <a href="/index.html">Home</a>
+        <a href="index.html" class="active">Menu</a>
+        <a href="../Cart Page/index.html">Order</a>
+        <a href="../About us Page/index.html">About Us</a>
+        <a href="../Contact Page/index.html">Contact</a>
+        <a href="#" class="icon-link" id="searchIcon">
+            <i class="fas fa-search"></i>
+        </a>
+        <a href="#" class="icon-link" id="cartLink">
+            <div class="cart-icon-container">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-badge" id="cartBadge">0</span>
+            </div>
         </a>
     </div>
 </nav>
 
 <!-- Search Overlay -->
 <div class="search-overlay" id="searchOverlay">
-  <div class="search-header">
-    <input type="text" id="searchInput" placeholder="Search 'drinks', 'pastry', 'pasta' or item name...">
-    <button id="searchButton">Search</button>
-    <span class="close-search" id="closeSearch">&times;</span>
-  </div>
-  <div class="search-results" id="searchResults"></div>
+    <div class="search-header">
+        <input type="text" id="searchInput" placeholder="Search 'drinks', 'pastry', 'pasta' or item name...">
+        <button id="searchButton">Search</button>
+        <span class="close-search" id="closeSearch">&times;</span>
+    </div>
+    <div class="search-results" id="searchResults"></div>
 </div>
 
 <!-- FILTERS -->
 <div class="filter-bar">
-  <button class="filter-btn" onclick="filterMenu('drinksSection')">Drinks</button>
-  <button class="filter-btn" onclick="filterMenu('pastrySection')">Pastry</button>
-  <button class="filter-btn" onclick="filterMenu('pastaSection')">Pasta</button>
+    <button class="filter-btn" onclick="filterMenu('drinksSection')">Drinks</button>
+    <button class="filter-btn" onclick="filterMenu('pastrySection')">Pastry</button>
+    <button class="filter-btn" onclick="filterMenu('pastaSection')">Pasta</button>
 
-  <div class="sort-dropdown">
-    <button class="filter-btn" id="sortBtn">Sort by Price ▼</button>
-    <div class="sort-dropdown-content" id="sortDropdown">
-      <button onclick="sortAllSections('low')">Low to High</button>
-      <button onclick="sortAllSections('high')">High to Low</button>
-      <button onclick="resetToOriginal()">Reset</button>
+    <div class="sort-dropdown">
+        <button class="filter-btn" id="sortBtn">Sort by Price ▼</button>
+        <div class="sort-dropdown-content" id="sortDropdown">
+            <button onclick="sortAllSections('low')">Low to High</button>
+            <button onclick="sortAllSections('high')">High to Low</button>
+            <button onclick="resetToOriginal()">Reset</button>
+        </div>
     </div>
-  </div>
 </div>
 
 <!-- DRINKS SECTION -->
 <div class="menu-section" id="drinksSection">
-  <div class="hero">
-    <img src="../Product Catalog Page/assets/img/drinkss.png" alt="Drinks">
-    <div class="hero-title">Drinks</div>
-  </div>
-  <div class="carousel-container">
-    <div class="arrow" onclick="scrollCarousel('drinks', -4)">❮</div>
-    <div class="products" id="drinks"></div>
-    <div class="arrow" onclick="scrollCarousel('drinks', 4)">❯</div>
-  </div>
-  <div class="dots">
-    <div class="dot active"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-  </div>
+    <div class="hero">
+        <img src="assets/img/drinkss.png" alt="Drinks" onerror="this.src='https://via.placeholder.com/1200x250?text=Drinks'">
+        <div class="hero-title">Drinks</div>
+    </div>
+    <div class="carousel-container">
+        <div class="arrow" onclick="scrollCarousel('drinks', -4)">❮</div>
+        <div class="products" id="drinks"></div>
+        <div class="arrow" onclick="scrollCarousel('drinks', 4)">❯</div>
+    </div>
+    <div class="dots">
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
 </div>
 
 <!-- PASTRY SECTION -->
 <div class="menu-section" id="pastrySection">
-  <div class="hero">
-    <img src="../Product Catalog Page/assets/img/pastryy.png" alt="Pastry">
-    <div class="hero-title">Pastry</div>
-  </div>
-  <div class="carousel-container">
-    <div class="arrow" onclick="scrollCarousel('pastry', -4)">❮</div>
-    <div class="products" id="pastry"></div>
-    <div class="arrow" onclick="scrollCarousel('pastry', 4)">❯</div>
-  </div>
-  <div class="dots">
-    <div class="dot active"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-  </div>
+    <div class="hero">
+        <img src="assets/img/pastryy.png" alt="Pastry" onerror="this.src='https://via.placeholder.com/1200x250?text=Pastry'">
+        <div class="hero-title">Pastry</div>
+    </div>
+    <div class="carousel-container">
+        <div class="arrow" onclick="scrollCarousel('pastry', -4)">❮</div>
+        <div class="products" id="pastry"></div>
+        <div class="arrow" onclick="scrollCarousel('pastry', 4)">❯</div>
+    </div>
+    <div class="dots">
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
 </div>
 
 <!-- PASTA SECTION -->
 <div class="menu-section" id="pastaSection">
-  <div class="hero">
-    <img src="../Product Catalog Page/assets/img/pastabannerr.png" alt="Pasta">
-    <div class="hero-title">Pastas</div>
-  </div>
-  <div class="carousel-container">
-    <div class="arrow" onclick="scrollCarousel('pasta', -4)">❮</div>
-    <div class="products" id="pasta"></div>
-    <div class="arrow" onclick="scrollCarousel('pasta', 4)">❯</div>
-  </div>
-  <div class="dots">
-    <div class="dot active"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-  </div>
+    <div class="hero">
+        <img src="assets/img/pastabannerr.png" alt="Pasta" onerror="this.src='https://via.placeholder.com/1200x250?text=Pasta'">
+        <div class="hero-title">Pastas</div>
+    </div>
+    <div class="carousel-container">
+        <div class="arrow" onclick="scrollCarousel('pasta', -4)">❮</div>
+        <div class="products" id="pasta"></div>
+        <div class="arrow" onclick="scrollCarousel('pasta', 4)">❯</div>
+    </div>
+    <div class="dots">
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
 </div>
 
 <!-- PRODUCT DETAIL MODAL -->
 <div class="modal-overlay" id="productModal">
-  <div class="modal-container">
-    <span class="modal-close" onclick="closeModal()">&times;</span>
-    <div id="modalDynamicContent"></div>
-  </div>
+    <div class="modal-container">
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+        <div id="modalDynamicContent"></div>
+    </div>
 </div>
 
 <!-- SUCCESS MODAL -->
 <div class="success-overlay" id="successModal">
-  <div class="success-modal">
-    <i class="fas fa-check-circle"></i>
-    <h2>SUCCESS!</h2>
-    <p id="successMessage">Item added to your cart.</p>
-    <button onclick="closeSuccessModal()">CONTINUE ORDERING</button>
-  </div>
+    <div class="success-modal">
+        <i class="fas fa-check-circle"></i>
+        <h2>SUCCESS!</h2>
+        <p id="successMessage">Item added to your cart.</p>
+        <button onclick="closeSuccessModal()">CONTINUE ORDERING</button>
+    </div>
 </div>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-top-row">
-    <div class="footer-brewha">BREW-HA</div>
-  </div>
-  <div class="footer-divider"></div>
-  <div class="footer-bottom-row">
-    <div class="footer-copyright">© 2026 All Rights Reserved</div>
-    <div class="footer-social">
-      <span>Follow Us</span>
-      <a href="https://www.facebook.com" target="_blank">
-        <svg class="footer-social-icon" viewBox="0 0 24 24">
-          <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.877v-6.987h-2.54v-2.89h2.54v-2.205c0-2.507 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.463h-1.26c-1.243 0-1.63.771-1.63 1.562v1.875h2.773l-.443 2.89h-2.33v6.987C18.343 21.128 22 16.991 22 12z"/>
-        </svg>
-      </a>
-      <a href="https://www.instagram.com" target="_blank">
-        <svg class="footer-social-icon" viewBox="0 0 24 24">
-          <path d="M7.75 2A5.75 5.75 0 002 7.75v8.5A5.75 5.75 0 007.75 22h8.5A5.75 5.75 0 0022 16.25v-8.5A5.75 5.75 0 0016.25 2h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm5.25-1.5a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0zM12 9a3 3 0 100 6 3 3 0 000-6z"/>
-        </svg>
-      </a>
+    <div class="footer-top-row">
+        <div class="footer-brewha">BREW-HA</div>
     </div>
-  </div>
+    <div class="footer-divider"></div>
+    <div class="footer-bottom-row">
+        <div class="footer-copyright">© 2026 All Rights Reserved</div>
+        <div class="footer-social">
+            <span>Follow Us</span>
+            <a href="https://www.facebook.com" target="_blank">
+                <svg class="footer-social-icon" viewBox="0 0 24 24">
+                    <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.877v-6.987h-2.54v-2.89h2.54v-2.205c0-2.507 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.463h-1.26c-1.243 0-1.63.771-1.63 1.562v1.875h2.773l-.443 2.89h-2.33v6.987C18.343 21.128 22 16.991 22 12z"/>
+                </svg>
+            </a>
+            <a href="https://www.instagram.com" target="_blank">
+                <svg class="footer-social-icon" viewBox="0 0 24 24">
+                    <path d="M7.75 2A5.75 5.75 0 002 7.75v8.5A5.75 5.75 0 007.75 22h8.5A5.75 5.75 0 0022 16.25v-8.5A5.75 5.75 0 0016.25 2h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm5.25-1.5a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0zM12 9a3 3 0 100 6 3 3 0 000-6z"/>
+                </svg>
+            </a>
+        </div>
+    </div>
 </footer>
 
-<script src="../Product Catalog Page/assets/js/scripts.js"></script>
+<script src="assets/js/scripts.js"></script>
 </body>
 </html>
