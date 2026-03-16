@@ -5,7 +5,9 @@ let currentFilter = 'all';
 
 async function loadCart() {
   try {
-    const response = await fetch(`${API_BASE}/cart/get.php`);
+    const response = await fetch(`${API_BASE}/cart/get.php`, {
+      credentials: 'include'
+    });
     const result = await response.json();
 
     if (result.success) {
@@ -28,8 +30,14 @@ function filterCategory(category) {
 
   const buttons = document.querySelectorAll('.cat-btn');
   buttons.forEach(btn => {
-    const text = btn.textContent.toLowerCase();
-    if (text === category || (category === 'all' && text === 'all')) {
+    const text = btn.textContent.toLowerCase().trim();
+
+    if (
+      (category === 'all' && text === 'all') ||
+      (category === 'drinks' && text === 'drink') ||
+      (category === 'pastry' && text === 'pastry') ||
+      (category === 'pasta' && text === 'pasta')
+    ) {
       btn.classList.add('active');
     }
   });
@@ -69,6 +77,7 @@ function renderCart() {
             ${item.name}
             ${item.size ? `<br><small style="color: #666;">Size: ${item.size}</small>` : ''}
             ${item.notes ? `<br><small style="color: #666;">Note: ${item.notes}</small>` : ''}
+            ${item.pieces ? `<br><small style="color: #666;">Quantity Selected: ${item.pieces}</small>` : ''}
           </div>
         </div>
         <div class="addons">${addonsHTML}</div>
@@ -127,11 +136,19 @@ async function decrease(itemId, currentQty) {
 
 async function updateQty(itemId, qty) {
   try {
-    await fetch(`${API_BASE}/cart/update.php`, {
+    const response = await fetch(`${API_BASE}/cart/update.php`, {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ item_id: itemId, qty })
     });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      alert(result.error || 'Failed to update cart');
+      return;
+    }
 
     await loadCart();
   } catch (error) {
@@ -141,11 +158,19 @@ async function updateQty(itemId, qty) {
 
 async function removeItem(itemId) {
   try {
-    await fetch(`${API_BASE}/cart/remove.php`, {
+    const response = await fetch(`${API_BASE}/cart/remove.php`, {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ item_id: itemId })
     });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      alert(result.error || 'Failed to remove item');
+      return;
+    }
 
     await loadCart();
   } catch (error) {
