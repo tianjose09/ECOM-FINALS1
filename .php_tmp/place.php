@@ -60,7 +60,6 @@ try {
 
     $total = $subtotal + $deliveryFee;
 
-    // basic ETA logic
     $estimatedMinutes = 15;
     if ($deliveryMethod === "delivery") {
         $estimatedMinutes += 15;

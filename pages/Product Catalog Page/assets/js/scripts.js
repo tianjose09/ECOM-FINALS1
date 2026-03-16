@@ -18,7 +18,9 @@ let currentBasePrice = 0;
 
 async function fetchProductsFromDB() {
     try {
-        const response = await fetch(`${API_BASE}/get_products.php`);
+        const response = await fetch(`${API_BASE}/get_products.php`, {
+            credentials: 'include'
+        });
         const result = await response.json();
 
         if (!result.success) {
@@ -45,7 +47,9 @@ async function fetchProductsFromDB() {
 
 async function updateCartBadge() {
     try {
-        const response = await fetch(`${API_BASE}/cart/get.php`);
+        const response = await fetch(`${API_BASE}/cart/get.php`, {
+            credentials: 'include'
+        });
         const result = await response.json();
         const badge = document.getElementById('cartBadge');
 
@@ -260,7 +264,7 @@ function changePieces(delta, basePrice) {
     if (priceElement) priceElement.textContent = `₱${totalPrice}`;
 }
 
-async function addToCart(productId, basePrice, sectionId) {
+async function addToCart(productId, basePrice, sectionId, showSuccess = true) {
     const isDrink = sectionId === 'drinks';
     const hasPieces = sectionId === 'pastry' || sectionId === 'pasta';
 
@@ -280,6 +284,7 @@ async function addToCart(productId, basePrice, sectionId) {
     try {
         const response = await fetch(`${API_BASE}/cart/add.php`, {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 product_id: productId,
@@ -294,24 +299,32 @@ async function addToCart(productId, basePrice, sectionId) {
 
         if (!result.success) {
             alert(result.error || 'Failed to add to cart');
-            return;
+            return false;
         }
 
-        document.getElementById('successMessage').innerHTML = `Item added to your cart successfully!`;
-        document.getElementById('successModal').style.display = 'flex';
+        if (showSuccess) {
+            document.getElementById('successMessage').innerHTML = `Item added to your cart successfully!`;
+            document.getElementById('successModal').style.display = 'flex';
+        }
 
         currentPieces = 1;
         closeModal();
-        updateCartBadge();
+        await updateCartBadge();
+
+        return true;
     } catch (error) {
         console.error(error);
         alert('Failed to connect to cart API');
+        return false;
     }
 }
 
 async function orderNow(productId, basePrice, sectionId) {
-    await addToCart(productId, basePrice, sectionId);
-    window.location.href = '../Cart Page/index.html';
+    const success = await addToCart(productId, basePrice, sectionId, false);
+
+    if (success) {
+        window.location.href = '../Cart Page/index.html';
+    }
 }
 
 function closeSuccessModal() {
