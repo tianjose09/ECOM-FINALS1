@@ -6,9 +6,16 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if (empty($_SESSION['user_id']) || ($_SESSION['user_role'] ?? '') !== 'admin') {
+if (empty($_SESSION['user_id'])) {
     jsonResponse([
         'success' => false,
-        'message' => 'Admin access only.'
+        'message' => 'Unauthorized.'
+    ], 401);
+}
+
+if (($_SESSION['user_role'] ?? '') !== 'admin') {
+    jsonResponse([
+        'success' => false,
+        'message' => 'Forbidden. Admin access only.'
     ], 403);
 }

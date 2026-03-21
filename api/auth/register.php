@@ -60,7 +60,7 @@ try {
     global $conn;
 
     if (!isset($conn) || $conn->connect_error) {
-        throw new Exception('Database connection failed: ' . $conn->connect_error);
+        throw new Exception('Database connection failed.');
     }
 
     $checkSql = "SELECT id FROM users WHERE name = ? LIMIT 1";

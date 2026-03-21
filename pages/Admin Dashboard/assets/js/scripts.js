@@ -11,7 +11,10 @@ let currentAdmin = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
   bindStaticEvents();
-  await ensureAdminSession();
+
+  const allowed = await ensureAdminSession();
+  if (!allowed) return;
+
   await loadDashboard();
 });
 
@@ -60,19 +63,33 @@ async function ensureAdminSession() {
     const data = await safeJson(response);
 
     if (!data.loggedIn) {
-      showPopupMessage("Please login first.", "error", `${window.location.origin}/ECOM-FINALS1/pages/Login%20Page/index.html`);
-      return;
+      showPopupMessage(
+        "Please login first.",
+        "error",
+        `${window.location.origin}/ECOM-FINALS1/pages/Login%20Page/index.html`
+      );
+      return false;
     }
 
     if ((data.user?.role || "") !== "admin") {
-      showPopupMessage("Admin access only.", "error", `${window.location.origin}/ECOM-FINALS1/index.html`);
-      return;
+      showPopupMessage(
+        "Admin access only.",
+        "error",
+        `${window.location.origin}/ECOM-FINALS1/index.html`
+      );
+      return false;
     }
 
     currentAdmin = data.user;
+    return true;
   } catch (error) {
     console.error("ensureAdminSession error:", error);
-    showPopupMessage("Session check failed.", "error", `${window.location.origin}/ECOM-FINALS1/pages/Login%20Page/index.html`);
+    showPopupMessage(
+      "Session check failed.",
+      "error",
+      `${window.location.origin}/ECOM-FINALS1/pages/Login%20Page/index.html`
+    );
+    return false;
   }
 }
 
@@ -124,10 +141,7 @@ async function handleLogout(event) {
     const response = await fetch(`${API_BASE}/auth/logout.php`, {
       method: "POST",
       credentials: "same-origin",
-      cache: "no-store",
-      headers: {
-        "X-Requested-With": "XMLHttpRequest"
-      }
+      cache: "no-store"
     });
 
     const data = await safeJson(response);
@@ -143,8 +157,6 @@ async function handleLogout(event) {
     }
   } catch (error) {
     console.error("logout error:", error);
-
-    // force redirect fallback
     window.location.replace(`${window.location.origin}/ECOM-FINALS1/pages/Login%20Page/index.html`);
   }
 }

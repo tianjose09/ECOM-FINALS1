@@ -31,7 +31,7 @@ try {
     global $conn;
 
     if (!isset($conn) || $conn->connect_error) {
-        throw new Exception('Database connection failed: ' . $conn->connect_error);
+        throw new Exception('Database connection failed.');
     }
 
     $sql = "SELECT id, name, password, role FROM users WHERE name = ? LIMIT 1";
@@ -68,6 +68,8 @@ try {
             'message' => 'Invalid username or password.'
         ], 401);
     }
+
+    session_regenerate_id(true);
 
     $_SESSION['user_id'] = (int) $user['id'];
     $_SESSION['user_name'] = $user['name'];
