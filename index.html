@@ -7,7 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Stardos+Stencil:wght@700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
 <link rel="stylesheet" href="./assets/css/style.css">
 </head>
 <body>
@@ -20,126 +19,82 @@
                     <circle cx="12" cy="7" r="4" />
                     <path d="M5.5 21c1.5-4 11-4 13 0" />
                 </svg>
-                <div class="dropdown-menu" id="dropdownMenu">
-                    <a href="#">Logout</a>
-                </div>
+                <div class="dropdown-menu" id="dropdownMenu"></div>
             </div>
-            <!-- <a href="index.html" class="brewha-text">BREW-HA</a> -->
         </div>
     </div>
+
     <div class="nav-right">
         <a href="index.html" class="active">Home</a>
         <a href="./pages/Product Catalog Page/index.html">Menu</a>
-        <a href="./pages/Cart Page/index.html">Order</a>
+        <a href="./pages/Cart Page/index.html" id="orderLink">Order</a>
         <a href="./pages/About us Page/index.html">About Us</a>
         <a href="./pages/Contact Page/index.html">Contact</a>
     </div>
 </nav>
 
-
 <div class="main-container">
-
     <div class="hero-section">
-    <img src="./assets/img/Header_Home.png" alt="Brew-Ha Hero" class="hero-img">
-    </div>  
+        <img src="./assets/img/Header_Home.png" alt="Brew-Ha Hero" class="hero-img">
+    </div>
 
     <div class="inner-main-container">
-    <section class="whats-new-section">
-        <div class="whats-new-header">
-            <h2>WHAT'S NEW?</h2>
-            <p>Discover the latest blends, seasonal treats, and exciting updates from our café.</p>
-        </div>
-        
-        <div class="carousel-wrapper">
-            <button class="nav-arrow" onclick="scrollCarousel('left')"><i class="fas fa-chevron-left"></i></button>
-            
-            <div class="carousel-container" id="whatsNewCarousel">
-                
-                <div class="product-card">
-                    <img src="./assets/img/your-product.png" alt="Product Name" class="product-img">
-                    <h3>Name</h3>
-                    <p>Lorem ipsum Lorem ipsum<br>Lorem ipsum Lorem ipsum</p>
-                    <div class="card-bottom">
-                        </div>
-                </div>
-
-                <div class="product-card">
-                    <img src="Photos/your-product.png" alt="Product Name" class="product-img">
-                    <h3>Name</h3>
-                    <p>Lorem ipsum Lorem ipsum<br>Lorem ipsum Lorem ipsum</p>
-                    <div class="card-bottom">
-                        </div>
-                </div>
-
-                <div class="product-card">
-                    <img src="Photos/your-product.png" alt="Product Name" class="product-img">
-                    <h3>Name</h3>
-                    <p>Lorem ipsum Lorem ipsum<br>Lorem ipsum Lorem ipsum</p>
-                <div class="card-bottom">
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <img src="Photos/your-product.png" alt="Product Name" class="product-img">
-                    <h3>Name</h3>
-                    <p>Lorem ipsum Lorem ipsum<br>Lorem ipsum Lorem ipsum</p>
-                <div class="card-bottom">
-                    </div>
-                </div>
-                
-                <div class="product-card">
-                    <img src="Photos/your-product.png" alt="Product Name" class="product-img">
-                    <h3>Name</h3>
-                    <p>Lorem ipsum Lorem ipsum<br>Lorem ipsum Lorem ipsum</p>
-                <div class="card-bottom">
-                    </div>
-                </div>
-
+        <section class="whats-new-section">
+            <div class="whats-new-header">
+                <h2>WHAT'S NEW?</h2>
+                <p>Discover the latest blends, seasonal treats, and exciting updates from our café.</p>
             </div>
-            
-            <button class="nav-arrow" onclick="scrollCarousel('right')"><i class="fas fa-chevron-right"></i></button>
-        </div>
+
+            <div class="carousel-wrapper">
+                <button class="nav-arrow" onclick="scrollCarousel('left')"><i class="fas fa-chevron-left"></i></button>
+
+                <div class="carousel-container" id="whatsNewCarousel">
+                    <!-- Random products from database -->
+                </div>
+
+                <button class="nav-arrow" onclick="scrollCarousel('right')"><i class="fas fa-chevron-right"></i></button>
+            </div>
         </section>
 
-    <section class="features-section">
-        <h2>FEATURES</h2>
-        <div class="features-layout">
-            <div class="feature-left">
-                <img src="./assets/img/Featured_Home.png" alt="Store Features" class="feature-img">
-                <p>There are no secret spell - only honest work!</p>
-            </div>
-            
-            <div class="feature-right">
-                <div class="feature-icons-row">
-                    <div class="icon-item">
-                        <div class="icon-circle">
-                            <span class="material-icons"><img src="./assets/img/DeliveryIcon.png" alt="On Time Delivery"></span>
-                        </div>
-                        <span>On Time Delivery</span>
-                    </div>
-                    <div class="icon-item">
-                        <div class="icon-circle">
-                            <span class="material-icons"><img src="./assets/img/BrewedIcon.png" alt="Freshly Brewed"></span>
-                        </div>
-                        <span>Freshly Brewed</span>
-                    </div>
-                    <div class="icon-item">
-                        <div class="icon-circle">
-                            <span class="material-icons"><img src="./assets/img/NaturalngIcon.png" alt="Natural Ingredients"></span>
-                        </div>
-                        <span>Natural Ingredients</span>
-                    </div>
+        <section class="features-section">
+            <h2>FEATURES</h2>
+            <div class="features-layout">
+                <div class="feature-left">
+                    <img src="./assets/img/Featured_Home.png" alt="Store Features" class="feature-img">
+                    <p>There are no secret spell - only honest work!</p>
                 </div>
-                
-                <p class="feature-description">
-                    Brew-Ha is a modern coffee shop dedicated to serving freshly brewed coffee made from natural,
-                    high-quality ingredients. We focus on delivering rich flavors and a comforting café experience with every cup.
-                    With our reliable on-time delivery service, you can enjoy your favorite coffee wherever you are. At Brew-Ha,
-                    freshness, quality, and convenience come together in every brew.
-                </p>
+
+                <div class="feature-right">
+                    <div class="feature-icons-row">
+                        <div class="icon-item">
+                            <div class="icon-circle">
+                                <span class="material-icons"><img src="./assets/img/DeliveryIcon.png" alt="On Time Delivery"></span>
+                            </div>
+                            <span>On Time Delivery</span>
+                        </div>
+                        <div class="icon-item">
+                            <div class="icon-circle">
+                                <span class="material-icons"><img src="./assets/img/BrewedIcon.png" alt="Freshly Brewed"></span>
+                            </div>
+                            <span>Freshly Brewed</span>
+                        </div>
+                        <div class="icon-item">
+                            <div class="icon-circle">
+                                <span class="material-icons"><img src="./assets/img/NaturalngIcon.png" alt="Natural Ingredients"></span>
+                            </div>
+                            <span>Natural Ingredients</span>
+                        </div>
+                    </div>
+
+                    <p class="feature-description">
+                        Brew-Ha is a modern coffee shop dedicated to serving freshly brewed coffee made from natural,
+                        high-quality ingredients. We focus on delivering rich flavors and a comforting café experience with every cup.
+                        With our reliable on-time delivery service, you can enjoy your favorite coffee wherever you are. At Brew-Ha,
+                        freshness, quality, and convenience come together in every brew.
+                    </p>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
     </div>
 </div>
 
@@ -167,6 +122,5 @@
 </footer>
 
 <script src="./assets/js/script.js"></script>
-
 </body>
 </html>
