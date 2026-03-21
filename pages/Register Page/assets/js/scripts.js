@@ -1,6 +1,10 @@
+const API_BASE = `${window.location.origin}/ECOM-FINALS1/api`;
+
 function togglePassword(inputId, iconId) {
   const passwordInput = document.getElementById(inputId);
   const toggleIcon = document.getElementById(iconId);
+
+  if (!passwordInput || !toggleIcon) return;
 
   if (passwordInput.type === 'password') {
     passwordInput.type = 'text';
@@ -11,25 +15,34 @@ function togglePassword(inputId, iconId) {
   }
 }
 
-function showSuccessMessage(message, redirectUrl) {
-  const successDiv = document.createElement('div');
-  successDiv.className = 'success-message';
-  successDiv.innerHTML = `
-    <span class="material-icons">check_circle</span>
-    <span class="message-text">${message}</span>
+function showPopupMessage(message, type = 'success', redirectUrl = null) {
+  const popup = document.createElement('div');
+  popup.className = `custom-popup ${type}`;
+  const icon = type === 'success' ? 'check_circle' : 'error';
+
+  popup.innerHTML = `
+    <span class="material-icons popup-icon">${icon}</span>
+    <span class="popup-text">${message}</span>
   `;
 
-  document.body.appendChild(successDiv);
+  document.body.appendChild(popup);
 
   setTimeout(() => {
-    successDiv.style.transition = 'opacity 0.3s ease';
-    successDiv.style.opacity = '0';
-
+    popup.style.opacity = '0';
     setTimeout(() => {
-      successDiv.remove();
-      window.location.href = redirectUrl;
+      popup.remove();
+      if (redirectUrl) window.location.href = redirectUrl;
     }, 300);
   }, 1500);
+}
+
+async function safeJson(response) {
+  const text = await response.text();
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    throw new Error(text || 'Invalid server response');
+  }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -37,6 +50,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const nameInput = document.getElementById('name');
   const passwordInput = document.getElementById('password');
   const confirmInput = document.getElementById('confirmPassword');
+
+  if (!registerBtn) return;
 
   registerBtn.addEventListener('click', async function (e) {
     e.preventDefault();
@@ -46,43 +61,50 @@ document.addEventListener('DOMContentLoaded', function () {
     const confirmPassword = confirmInput.value.trim();
 
     if (!name || !password || !confirmPassword) {
-      alert('Please fill in all fields');
+      showPopupMessage('Please fill in all fields.', 'error');
+      return;
+    }
+
+    if (name.length < 3) {
+      showPopupMessage('Username must be at least 3 characters long.', 'error');
+      return;
+    }
+
+    if (!/^[A-Za-z0-9_]+$/.test(name)) {
+      showPopupMessage('Username can only contain letters, numbers, and underscore.', 'error');
       return;
     }
 
     if (password !== confirmPassword) {
-      alert('Passwords do not match!');
+      showPopupMessage('Passwords do not match.', 'error');
       return;
     }
 
     if (password.length < 8) {
-      alert('Password must be at least 8 characters long');
+      showPopupMessage('Password must be at least 8 characters long.', 'error');
       return;
     }
 
     try {
-      const response = await fetch('../../api/auth/register.php', {
+      const response = await fetch(`${API_BASE}/auth/register.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          name,
-          password,
-          confirmPassword
-        })
+        credentials: 'same-origin',
+        body: JSON.stringify({ name, password, confirmPassword })
       });
 
-      const data = await response.json();
+      const data = await safeJson(response);
 
       if (data.success) {
-        showSuccessMessage('You registered successfully!', '../Login Page/index.html');
+        showPopupMessage('Registration successful!', 'success', '../Login Page/index.html');
       } else {
-        alert(data.message || 'Registration failed.');
+        showPopupMessage(data.message || 'Registration failed.', 'error');
       }
     } catch (error) {
-      console.error(error);
-      alert('Registration failed.');
+      console.error('Register error:', error);
+      showPopupMessage('Registration failed.', 'error');
     }
   });
 });
