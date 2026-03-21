@@ -1,24 +1,15 @@
 <?php
-$host = "localhost";
-$dbname = "brewha_db";
-$username = "root";
-$password = "";
 
-// Create connection
-$conn = new mysqli($host, $username, $password, $dbname);
+$host = '127.0.0.1';
+$port = '3307';
+$dbname = 'brewha_db';
+$username = 'root';
+$password = '';
 
-// Check connection
+$conn = new mysqli($host, $username, $password, $dbname, (int)$port);
+
 if ($conn->connect_error) {
-    error_log("Database connection failed: " . $conn->connect_error);
-    $conn = null;
-} else {
-    // Set charset to UTF-8
-    $conn->set_charset("utf8");
+    die('Database connection failed: ' . $conn->connect_error);
 }
 
-// Function to check connection
-function is_db_connected() {
-    global $conn;
-    return isset($conn) && $conn && !$conn->connect_error;
-}
-?>
+$conn->set_charset('utf8mb4');
