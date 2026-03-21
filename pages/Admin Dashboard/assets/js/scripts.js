@@ -1,90 +1,98 @@
-/*
-  BACKEND-READY ADMIN DASHBOARD
-  --------------------------------
-  Replace sampleDashboardData with API data later.
+const API_BASE = `${window.location.origin}/ECOM-FINALS1/api`;
 
-  Example:
-  fetch('/api/admin/dashboard')
-    .then(response => response.json())
-    .then(data => renderDashboard(data));
-*/
-
-const sampleDashboardData = {
-  selectedCategory: "drink",
-  products: {
-    drink: [
-      { id: 1, name: "Iced Americano", price: 120, status: "Available", totalOrder: 18, colorClass: "dot-drink" },
-      { id: 2, name: "Caramel Latte", price: 145, status: "Not Available", totalOrder: 11, colorClass: "dot-pastry" },
-      { id: 3, name: "Mocha", price: 135, status: "Available", totalOrder: 16, colorClass: "dot-pasta" }
-    ],
-    pastry: [
-      { id: 4, name: "Croissant", price: 110, status: "Available", totalOrder: 21, colorClass: "dot-drink" },
-      { id: 5, name: "Danish", price: 125, status: "Not Available", totalOrder: 8, colorClass: "dot-pastry" },
-      { id: 6, name: "Muffin", price: 95, status: "Available", totalOrder: 14, colorClass: "dot-pasta" }
-    ],
-    pasta: [
-      { id: 7, name: "Carbonara", price: 220, status: "Available", totalOrder: 13, colorClass: "dot-drink" },
-      { id: 8, name: "Bolognese", price: 235, status: "Available", totalOrder: 10, colorClass: "dot-pastry" },
-      { id: 9, name: "Pesto Pasta", price: 210, status: "Not Available", totalOrder: 7, colorClass: "dot-pasta" }
-    ]
-  },
-  users: [
-    {
-      id: 101,
-      name: "User Name Here",
-      orders: [
-        { productName: "Drink Name Here", qtySize: "## | Size", orderNo: "####" },
-        { productName: "Lorem", qtySize: "Lorem", orderNo: "Lorem" },
-        { productName: "Lorem", qtySize: "Lorem", orderNo: "Lorem" },
-        { productName: "Lorem", qtySize: "Lorem", orderNo: "Lorem" },
-        { productName: "Lorem", qtySize: "Lorem", orderNo: "Lorem" },
-        { productName: "Lorem", qtySize: "## Size", orderNo: "Lorem" },
-        { productName: "Pastry Name Here", qtySize: "## Size", orderNo: "Lorem" }
-      ]
-    },
-    {
-      id: 102,
-      name: "User Name Here 2",
-      orders: [
-        { productName: "Iced Latte", qtySize: "2 | Grande", orderNo: "1002" },
-        { productName: "Croissant", qtySize: "1 | Regular", orderNo: "1002" }
-      ]
-    },
-    {
-      id: 103,
-      name: "User Name Here 3",
-      orders: [
-        { productName: "Pasta Alfredo", qtySize: "1 | Solo", orderNo: "1003" },
-        { productName: "Mocha", qtySize: "1 | Tall", orderNo: "1003" }
-      ]
-    }
-  ]
+let dashboardState = {
+  products: [],
+  users: []
 };
 
-let dashboardState = JSON.parse(JSON.stringify(sampleDashboardData));
-let activeCategory = dashboardState.selectedCategory || "drink";
-let selectedUserId = dashboardState.users.length ? dashboardState.users[0].id : null;
+let activeCategory = "drinks";
+let selectedUserId = null;
+let currentAdmin = null;
 
-document.addEventListener("DOMContentLoaded", () => {
-  initializeDropdown();
-  initializeCategoryButtons();
-  initializeProductModal();
-  initializeRefreshButton();
-  renderDashboard();
+document.addEventListener("DOMContentLoaded", async () => {
+  bindStaticEvents();
+  await ensureAdminSession();
+  await loadDashboard();
 });
 
-function initializeDropdown() {
+function bindStaticEvents() {
+  bindDropdown();
+  bindCategoryButtons();
+  bindRefreshButton();
+  bindInlineButtons();
+  bindProductModal();
+  bindUserModal();
+}
+
+function showPopupMessage(message, type = "success", redirectUrl = null) {
+  const popup = document.createElement("div");
+  popup.className = `custom-popup ${type}`;
+  popup.innerHTML = `<span class="popup-text">${message}</span>`;
+  document.body.appendChild(popup);
+
+  setTimeout(() => {
+    popup.style.opacity = "0";
+    setTimeout(() => {
+      popup.remove();
+      if (redirectUrl) {
+        window.location.replace(redirectUrl);
+      }
+    }, 300);
+  }, 1500);
+}
+
+async function safeJson(response) {
+  const text = await response.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(text || "Invalid server response.");
+  }
+}
+
+async function ensureAdminSession() {
+  try {
+    const response = await fetch(`${API_BASE}/auth/me.php`, {
+      credentials: "same-origin",
+      cache: "no-store"
+    });
+
+    const data = await safeJson(response);
+
+    if (!data.loggedIn) {
+      showPopupMessage("Please login first.", "error", `${window.location.origin}/ECOM-FINALS1/pages/Login%20Page/index.html`);
+      return;
+    }
+
+    if ((data.user?.role || "") !== "admin") {
+      showPopupMessage("Admin access only.", "error", `${window.location.origin}/ECOM-FINALS1/index.html`);
+      return;
+    }
+
+    currentAdmin = data.user;
+  } catch (error) {
+    console.error("ensureAdminSession error:", error);
+    showPopupMessage("Session check failed.", "error", `${window.location.origin}/ECOM-FINALS1/pages/Login%20Page/index.html`);
+  }
+}
+
+function bindDropdown() {
   const accountDropdown = document.getElementById("accountDropdown");
   const dropdownMenu = document.getElementById("dropdownMenu");
+  const logoutLink = document.getElementById("logoutLink");
+  const adminProfileLink = document.getElementById("adminProfileLink");
 
   if (!accountDropdown || !dropdownMenu) return;
 
   accountDropdown.addEventListener("click", (event) => {
     event.stopPropagation();
     dropdownMenu.classList.toggle("show");
-
     const expanded = accountDropdown.getAttribute("aria-expanded") === "true";
     accountDropdown.setAttribute("aria-expanded", String(!expanded));
+  });
+
+  dropdownMenu.addEventListener("click", (event) => {
+    event.stopPropagation();
   });
 
   document.addEventListener("click", (event) => {
@@ -93,12 +101,56 @@ function initializeDropdown() {
       accountDropdown.setAttribute("aria-expanded", "false");
     }
   });
+
+  if (adminProfileLink) {
+    adminProfileLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      showPopupMessage(
+        currentAdmin ? `Logged in as ${currentAdmin.name}` : "Admin profile",
+        "success"
+      );
+    });
+  }
+
+  if (logoutLink) {
+    logoutLink.addEventListener("click", handleLogout);
+  }
 }
 
-function initializeCategoryButtons() {
-  const buttons = document.querySelectorAll(".category-btn");
+async function handleLogout(event) {
+  event.preventDefault();
 
-  buttons.forEach((button) => {
+  try {
+    const response = await fetch(`${API_BASE}/auth/logout.php`, {
+      method: "POST",
+      credentials: "same-origin",
+      cache: "no-store",
+      headers: {
+        "X-Requested-With": "XMLHttpRequest"
+      }
+    });
+
+    const data = await safeJson(response);
+
+    if (data.success) {
+      showPopupMessage(
+        "Logged out successfully!",
+        "success",
+        `${window.location.origin}/ECOM-FINALS1/pages/Login%20Page/index.html`
+      );
+    } else {
+      showPopupMessage(data.message || "Logout failed.", "error");
+    }
+  } catch (error) {
+    console.error("logout error:", error);
+
+    // force redirect fallback
+    window.location.replace(`${window.location.origin}/ECOM-FINALS1/pages/Login%20Page/index.html`);
+  }
+}
+
+function bindCategoryButtons() {
+  document.querySelectorAll(".category-btn[data-category]").forEach((button) => {
     button.addEventListener("click", () => {
       activeCategory = button.dataset.category;
       updateCategoryActiveState();
@@ -107,40 +159,100 @@ function initializeCategoryButtons() {
   });
 }
 
-function initializeRefreshButton() {
+function bindRefreshButton() {
   const refreshBtn = document.getElementById("refreshDashboardBtn");
   if (!refreshBtn) return;
 
-  refreshBtn.addEventListener("click", (event) => {
+  refreshBtn.addEventListener("click", async (event) => {
     event.preventDefault();
-    renderDashboard();
+    await loadDashboard();
+    showPopupMessage("Dashboard refreshed.", "success");
   });
 }
 
-function initializeProductModal() {
+function bindInlineButtons() {
+  const openAddProductInline = document.getElementById("openAddProductInline");
+  const openAddUserInline = document.getElementById("openAddUserInline");
+
+  if (openAddProductInline) {
+    openAddProductInline.addEventListener("click", (e) => {
+      e.preventDefault();
+      openAddProductModal();
+    });
+  }
+
+  if (openAddUserInline) {
+    openAddUserInline.addEventListener("click", (e) => {
+      e.preventDefault();
+      openAddUserModal();
+    });
+  }
+}
+
+function bindProductModal() {
   const productModal = document.getElementById("productModal");
   const closeProductModal = document.getElementById("closeProductModal");
   const cancelProductEdit = document.getElementById("cancelProductEdit");
   const productForm = document.getElementById("productForm");
 
-  if (closeProductModal) {
-    closeProductModal.addEventListener("click", closeEditModal);
-  }
+  closeProductModal?.addEventListener("click", closeProductModalFn);
+  cancelProductEdit?.addEventListener("click", closeProductModalFn);
 
-  if (cancelProductEdit) {
-    cancelProductEdit.addEventListener("click", closeEditModal);
-  }
+  productModal?.addEventListener("click", (event) => {
+    if (event.target === productModal) closeProductModalFn();
+  });
 
-  if (productModal) {
-    productModal.addEventListener("click", (event) => {
-      if (event.target === productModal) {
-        closeEditModal();
-      }
+  productForm?.addEventListener("submit", handleProductFormSubmit);
+}
+
+function bindUserModal() {
+  const userModal = document.getElementById("userModal");
+  const closeUserModal = document.getElementById("closeUserModal");
+  const cancelUserEdit = document.getElementById("cancelUserEdit");
+  const userForm = document.getElementById("userForm");
+
+  closeUserModal?.addEventListener("click", closeUserModalFn);
+  cancelUserEdit?.addEventListener("click", closeUserModalFn);
+
+  userModal?.addEventListener("click", (event) => {
+    if (event.target === userModal) closeUserModalFn();
+  });
+
+  userForm?.addEventListener("submit", handleUserFormSubmit);
+}
+
+async function loadDashboard() {
+  try {
+    const response = await fetch(`${API_BASE}/admin/dashboard.php`, {
+      credentials: "same-origin",
+      cache: "no-store"
     });
-  }
 
-  if (productForm) {
-    productForm.addEventListener("submit", handleProductFormSubmit);
+    const data = await safeJson(response);
+
+    if (!data.success) {
+      showPopupMessage(data.message || "Failed to load dashboard.", "error");
+      return;
+    }
+
+    dashboardState.products = data.products || [];
+    dashboardState.users = data.users || [];
+
+    if (!selectedUserId && dashboardState.users.length) {
+      selectedUserId = dashboardState.users[0].id;
+    }
+
+    if (
+      selectedUserId &&
+      !dashboardState.users.find((u) => Number(u.id) === Number(selectedUserId))
+    ) {
+      selectedUserId = dashboardState.users.length ? dashboardState.users[0].id : null;
+    }
+
+    renderDashboard();
+  } catch (error) {
+    console.error("loadDashboard error:", error);
+    showPopupMessage("Failed to load dashboard.", "error");
   }
 }
 
@@ -152,8 +264,7 @@ function renderDashboard() {
 }
 
 function updateCategoryActiveState() {
-  const buttons = document.querySelectorAll(".category-btn");
-  buttons.forEach((button) => {
+  document.querySelectorAll(".category-btn[data-category]").forEach((button) => {
     button.classList.toggle("active", button.dataset.category === activeCategory);
   });
 }
@@ -162,7 +273,9 @@ function renderProducts() {
   const productTableBody = document.getElementById("productTableBody");
   if (!productTableBody) return;
 
-  const products = dashboardState.products[activeCategory] || [];
+  const products = dashboardState.products.filter(
+    (product) => product.category === activeCategory
+  );
 
   if (!products.length) {
     productTableBody.innerHTML = `
@@ -180,19 +293,15 @@ function renderProducts() {
   productTableBody.innerHTML = products.map((product) => `
     <div class="product-row">
       <div class="product-name-cell">
-        <span class="product-dot ${product.colorClass || 'dot-drink'}"></span>
         <span>${escapeHtml(product.name)}</span>
       </div>
-      <div class="price-cell">PHP. ${formatNumber(product.price)}</div>
-      <div class="status-cell ${product.status === 'Available' ? 'status-available' : 'status-unavailable'}">
-        ${escapeHtml(product.status)}
+      <div class="price-cell">PHP ${formatMoney(product.price)}</div>
+      <div class="status-cell ${Number(product.availability) === 1 ? "status-available" : "status-unavailable"}">
+        ${Number(product.availability) === 1 ? "Available" : "Not Available"}
       </div>
-      <div class="orders-cell">#${formatNumber(product.totalOrder)}</div>
+      <div class="orders-cell">#${formatNumber(product.total_orders)}</div>
       <div class="actions-cell">
-        <button class="action-btn add-btn" type="button" title="Add Order" onclick="handleAddOrder(${product.id})">
-          <i class="fas fa-plus"></i>
-        </button>
-        <button class="action-btn edit-btn" type="button" title="Edit Product" onclick="openEditModal(${product.id})">
+        <button class="action-btn edit-btn" type="button" title="Edit Product" onclick="openEditProductModal(${product.id})">
           <i class="fas fa-pen-to-square"></i>
         </button>
         <button class="action-btn delete-btn" type="button" title="Delete Product" onclick="deleteProduct(${product.id})">
@@ -213,9 +322,19 @@ function renderUsers() {
   }
 
   usersList.innerHTML = dashboardState.users.map((user) => `
-    <div class="user-item ${user.id === selectedUserId ? 'active' : ''}" onclick="selectUser(${user.id})">
-      <i class="far fa-circle-user"></i>
-      <span>${escapeHtml(user.name)}</span>
+    <div class="user-item ${Number(user.id) === Number(selectedUserId) ? "active" : ""}">
+      <div class="user-main" onclick="selectUser(${user.id})">
+        <i class="far fa-circle-user"></i>
+        <span>${escapeHtml(user.name)} (${escapeHtml(user.role)})</span>
+      </div>
+      <div class="user-actions">
+        <button class="action-btn edit-btn" type="button" title="Edit User" onclick="openEditUserModal(${user.id})">
+          <i class="fas fa-pen-to-square"></i>
+        </button>
+        <button class="action-btn delete-btn" type="button" title="Delete User" onclick="deleteUser(${user.id})">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
     </div>
   `).join("");
 }
@@ -226,15 +345,15 @@ function renderSelectedUserOrders() {
 
   if (!selectedUserName || !selectedUserOrders) return;
 
-  const user = dashboardState.users.find((item) => item.id === selectedUserId);
+  const user = dashboardState.users.find((item) => Number(item.id) === Number(selectedUserId));
 
   if (!user) {
-    selectedUserName.textContent = "Selected User Name Here";
+    selectedUserName.textContent = "Selected User";
     selectedUserOrders.innerHTML = `<div class="order-line"><div>-</div><div>-</div><div>-</div></div>`;
     return;
   }
 
-  selectedUserName.textContent = user.name;
+  selectedUserName.textContent = `${user.name} (${user.role})`;
 
   if (!user.orders || !user.orders.length) {
     selectedUserOrders.innerHTML = `<div class="order-line"><div>No orders</div><div>-</div><div>-</div></div>`;
@@ -243,112 +362,226 @@ function renderSelectedUserOrders() {
 
   selectedUserOrders.innerHTML = user.orders.map((order) => `
     <div class="order-line">
-      <div>${escapeHtml(order.productName)}</div>
-      <div>${escapeHtml(order.qtySize)}</div>
-      <div>${escapeHtml(order.orderNo)}</div>
+      <div>${escapeHtml(order.product_name)}</div>
+      <div>${escapeHtml(order.qty_size)}</div>
+      <div>${escapeHtml(order.order_number)}</div>
     </div>
   `).join("");
 }
 
-function selectUser(userId) {
+window.selectUser = function (userId) {
   selectedUserId = userId;
   renderUsers();
   renderSelectedUserOrders();
-}
+};
 
-function handleAddOrder(productId) {
-  const product = findProductById(productId);
-  if (!product) return;
-
-  alert(`Backend-ready action: add new order for ${product.name}`);
-}
-
-function openEditModal(productId) {
-  const product = findProductById(productId);
-  if (!product) return;
-
-  document.getElementById("productId").value = product.id;
-  document.getElementById("productName").value = product.name;
-  document.getElementById("productPrice").value = product.price;
-  document.getElementById("productStatus").value = product.status;
-
+function openAddProductModal() {
+  document.getElementById("productModalTitle").textContent = "Add Product";
+  document.getElementById("productId").value = "";
+  document.getElementById("productName").value = "";
+  document.getElementById("productCategory").value = activeCategory;
+  document.getElementById("productPrice").value = "";
+  document.getElementById("productStatus").value = "1";
+  document.getElementById("productDescription").value = "";
+  document.getElementById("productImagePath").value = "";
   document.getElementById("productModal").classList.add("show");
 }
+window.openAddProductModal = openAddProductModal;
 
-function closeEditModal() {
+function openEditProductModal(productId) {
+  const product = dashboardState.products.find((item) => Number(item.id) === Number(productId));
+  if (!product) return;
+
+  document.getElementById("productModalTitle").textContent = "Edit Product";
+  document.getElementById("productId").value = product.id;
+  document.getElementById("productName").value = product.name;
+  document.getElementById("productCategory").value = product.category;
+  document.getElementById("productPrice").value = product.price;
+  document.getElementById("productStatus").value = String(product.availability);
+  document.getElementById("productDescription").value = product.description || "";
+  document.getElementById("productImagePath").value = product.image_path || "";
+  document.getElementById("productModal").classList.add("show");
+}
+window.openEditProductModal = openEditProductModal;
+
+function closeProductModalFn() {
   document.getElementById("productModal").classList.remove("show");
 }
 
-function handleProductFormSubmit(event) {
+async function handleProductFormSubmit(event) {
   event.preventDefault();
 
-  const productId = Number(document.getElementById("productId").value);
-  const updatedName = document.getElementById("productName").value.trim();
-  const updatedPrice = Number(document.getElementById("productPrice").value);
-  const updatedStatus = document.getElementById("productStatus").value;
+  const id = document.getElementById("productId").value.trim();
+  const payload = {
+    name: document.getElementById("productName").value.trim(),
+    category: document.getElementById("productCategory").value,
+    price: document.getElementById("productPrice").value,
+    availability: document.getElementById("productStatus").value,
+    description: document.getElementById("productDescription").value.trim(),
+    image_path: document.getElementById("productImagePath").value.trim()
+  };
 
-  const product = findProductById(productId);
-  if (!product) return;
+  try {
+    const response = await fetch(
+      id ? `${API_BASE}/admin/products/update.php?id=${encodeURIComponent(id)}` : `${API_BASE}/admin/products/create.php`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify(payload)
+      }
+    );
 
-  product.name = updatedName;
-  product.price = updatedPrice;
-  product.status = updatedStatus;
+    const data = await safeJson(response);
 
-  renderProducts();
-  closeEditModal();
-
-  /*
-    BACKEND READY:
-    Replace local update with API request later.
-
-    Example:
-    fetch(`/api/admin/products/${productId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: updatedName,
-        price: updatedPrice,
-        status: updatedStatus
-      })
-    })
-  */
+    if (data.success) {
+      closeProductModalFn();
+      await loadDashboard();
+      showPopupMessage(id ? "Product updated successfully." : "Product created successfully.", "success");
+    } else {
+      showPopupMessage(data.message || "Failed to save product.", "error");
+    }
+  } catch (error) {
+    console.error("handleProductFormSubmit error:", error);
+    showPopupMessage("Failed to save product.", "error");
+  }
 }
 
-function deleteProduct(productId) {
-  const product = findProductById(productId);
-  if (!product) return;
-
-  const confirmed = confirm(`Delete ${product.name}?`);
+window.deleteProduct = async function (productId) {
+  const confirmed = confirm("Delete this product?");
   if (!confirmed) return;
 
-  dashboardState.products[activeCategory] = dashboardState.products[activeCategory].filter(
-    (item) => item.id !== productId
-  );
+  try {
+    const response = await fetch(`${API_BASE}/admin/products/delete.php?id=${encodeURIComponent(productId)}`, {
+      method: "POST",
+      credentials: "same-origin"
+    });
 
-  renderProducts();
+    const data = await safeJson(response);
 
-  /*
-    BACKEND READY:
-    Replace with DELETE API later.
+    if (data.success) {
+      await loadDashboard();
+      showPopupMessage("Product deleted successfully.", "success");
+    } else {
+      showPopupMessage(data.message || "Failed to delete product.", "error");
+    }
+  } catch (error) {
+    console.error("deleteProduct error:", error);
+    showPopupMessage("Failed to delete product.", "error");
+  }
+};
 
-    Example:
-    fetch(`/api/admin/products/${productId}`, {
-      method: 'DELETE'
-    })
-  */
+function openAddUserModal() {
+  document.getElementById("userModalTitle").textContent = "Add User";
+  document.getElementById("userId").value = "";
+  document.getElementById("userNameInput").value = "";
+  document.getElementById("userPasswordInput").value = "";
+  document.getElementById("userRoleInput").value = "customer";
+  document.getElementById("userModal").classList.add("show");
+}
+window.openAddUserModal = openAddUserModal;
+
+function openEditUserModal(userId) {
+  const user = dashboardState.users.find((item) => Number(item.id) === Number(userId));
+  if (!user) return;
+
+  document.getElementById("userModalTitle").textContent = "Edit User";
+  document.getElementById("userId").value = user.id;
+  document.getElementById("userNameInput").value = user.name;
+  document.getElementById("userPasswordInput").value = "";
+  document.getElementById("userRoleInput").value = user.role;
+  document.getElementById("userModal").classList.add("show");
+}
+window.openEditUserModal = openEditUserModal;
+
+function closeUserModalFn() {
+  document.getElementById("userModal").classList.remove("show");
 }
 
-function findProductById(productId) {
-  const products = dashboardState.products[activeCategory] || [];
-  return products.find((product) => product.id === productId);
+async function handleUserFormSubmit(event) {
+  event.preventDefault();
+
+  const id = document.getElementById("userId").value.trim();
+  const payload = {
+    name: document.getElementById("userNameInput").value.trim(),
+    password: document.getElementById("userPasswordInput").value.trim(),
+    role: document.getElementById("userRoleInput").value
+  };
+
+  try {
+    const response = await fetch(
+      id ? `${API_BASE}/admin/users/update.php?id=${encodeURIComponent(id)}` : `${API_BASE}/admin/users/create.php`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify(payload)
+      }
+    );
+
+    const data = await safeJson(response);
+
+    if (data.success) {
+      closeUserModalFn();
+      await loadDashboard();
+      showPopupMessage(id ? "User updated successfully." : "User created successfully.", "success");
+    } else {
+      showPopupMessage(data.message || "Failed to save user.", "error");
+    }
+  } catch (error) {
+    console.error("handleUserFormSubmit error:", error);
+    showPopupMessage("Failed to save user.", "error");
+  }
 }
+
+window.deleteUser = async function (userId) {
+  const user = dashboardState.users.find((item) => Number(item.id) === Number(userId));
+  if (!user) return;
+
+  if (user.role === "admin") {
+    showPopupMessage("Deleting admin users is blocked here.", "error");
+    return;
+  }
+
+  const confirmed = confirm(`Delete user ${user.name}?`);
+  if (!confirmed) return;
+
+  try {
+    const response = await fetch(`${API_BASE}/admin/users/delete.php?id=${encodeURIComponent(userId)}`, {
+      method: "POST",
+      credentials: "same-origin"
+    });
+
+    const data = await safeJson(response);
+
+    if (data.success) {
+      if (Number(selectedUserId) === Number(userId)) {
+        selectedUserId = null;
+      }
+      await loadDashboard();
+      showPopupMessage("User deleted successfully.", "success");
+    } else {
+      showPopupMessage(data.message || "Failed to delete user.", "error");
+    }
+  } catch (error) {
+    console.error("deleteUser error:", error);
+    showPopupMessage("Failed to delete user.", "error");
+  }
+};
 
 function formatNumber(value) {
-  return Number(value).toLocaleString("en-PH");
+  return Number(value || 0).toLocaleString("en-PH");
+}
+
+function formatMoney(value) {
+  return Number(value || 0).toLocaleString("en-PH", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
 }
 
 function escapeHtml(value) {
-  return String(value)
+  return String(value ?? "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")

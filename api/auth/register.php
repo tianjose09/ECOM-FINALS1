@@ -29,6 +29,20 @@ try {
         ], 422);
     }
 
+    if (strlen($name) < 3) {
+        jsonResponse([
+            'success' => false,
+            'message' => 'Username must be at least 3 characters long.'
+        ], 422);
+    }
+
+    if (!preg_match('/^[A-Za-z0-9_]+$/', $name)) {
+        jsonResponse([
+            'success' => false,
+            'message' => 'Username can only contain letters, numbers, and underscore.'
+        ], 422);
+    }
+
     if ($password !== $confirmPassword) {
         jsonResponse([
             'success' => false,

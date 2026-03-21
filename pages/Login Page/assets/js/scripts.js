@@ -11,6 +11,30 @@ function togglePassword() {
   }
 }
 
+function showPopupMessage(message, type = 'success', redirectUrl = null) {
+  const popup = document.createElement('div');
+  popup.className = `custom-popup ${type}`;
+
+  const icon = type === 'success' ? 'check_circle' : 'error';
+
+  popup.innerHTML = `
+    <span class="material-icons popup-icon">${icon}</span>
+    <span class="popup-text">${message}</span>
+  `;
+
+  document.body.appendChild(popup);
+
+  setTimeout(() => {
+    popup.style.opacity = '0';
+    setTimeout(() => {
+      popup.remove();
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      }
+    }, 300);
+  }, 1500);
+}
+
 async function getSessionUser() {
   try {
     const response = await fetch('../../api/auth/me.php', {
@@ -18,6 +42,7 @@ async function getSessionUser() {
     });
     return await response.json();
   } catch (error) {
+    console.error(error);
     return { success: false, loggedIn: false };
   }
 }
@@ -66,18 +91,22 @@ function setupDropdown(sessionData) {
     logoutLink.addEventListener('click', async function (e) {
       e.preventDefault();
 
-      const response = await fetch('../../api/auth/logout.php', {
-        method: 'POST',
-        credentials: 'same-origin'
-      });
+      try {
+        const response = await fetch('../../api/auth/logout.php', {
+          method: 'POST',
+          credentials: 'same-origin'
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (data.success) {
-        alert('Logged out successfully.');
-        window.location.href = '../../index.html';
-      } else {
-        alert(data.message || 'Logout failed.');
+        if (data.success) {
+          showPopupMessage('Logged out successfully!', 'success', '../../index.html');
+        } else {
+          showPopupMessage(data.message || 'Logout failed.', 'error');
+        }
+      } catch (error) {
+        console.error(error);
+        showPopupMessage('Logout failed.', 'error');
       }
     });
   }
@@ -88,7 +117,11 @@ document.addEventListener('DOMContentLoaded', async function () {
   setupDropdown(sessionData);
 
   if (sessionData.loggedIn) {
-    window.location.href = '../../index.html';
+    if (sessionData.user.role === 'admin') {
+      window.location.href = '../../pages/Admin Dashboard/index.html';
+    } else {
+      window.location.href = '../../index.html';
+    }
     return;
   }
 
@@ -103,7 +136,12 @@ document.addEventListener('DOMContentLoaded', async function () {
       const password = document.getElementById('password').value.trim();
 
       if (!name || !password) {
-        alert('Please fill in all fields');
+        showPopupMessage('Please fill in all fields.', 'error');
+        return;
+      }
+
+      if (name.length < 3) {
+        showPopupMessage('Username must be at least 3 characters long.', 'error');
         return;
       }
 
@@ -123,14 +161,13 @@ document.addEventListener('DOMContentLoaded', async function () {
         const data = await response.json();
 
         if (data.success) {
-          alert('Login successful!');
-          window.location.href = '../../index.html';
+          showPopupMessage('Login successful!', 'success', data.redirect || '../../index.html');
         } else {
-          alert(data.message || 'Login failed.');
+          showPopupMessage(data.message || 'Login failed.', 'error');
         }
       } catch (error) {
         console.error(error);
-        alert('Login failed.');
+        showPopupMessage('Login failed.', 'error');
       }
     });
   }
@@ -138,7 +175,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   if (navLoginLink) {
     navLoginLink.addEventListener('click', (e) => {
       e.preventDefault();
-      alert('Already on Login page');
+      showPopupMessage('Already on Login page.', 'error');
     });
   }
 });

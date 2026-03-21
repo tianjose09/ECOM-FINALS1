@@ -31,11 +31,16 @@ try {
     global $conn;
 
     if (!isset($conn) || $conn->connect_error) {
-        throw new Exception('Database connection failed.');
+        throw new Exception('Database connection failed: ' . $conn->connect_error);
     }
 
     $sql = "SELECT id, name, password, role FROM users WHERE name = ? LIMIT 1";
     $stmt = $conn->prepare($sql);
+
+    if (!$stmt) {
+        throw new Exception('Prepare failed: ' . $conn->error);
+    }
+
     $stmt->bind_param('s', $name);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -49,7 +54,15 @@ try {
 
     $user = $result->fetch_assoc();
 
-    if (!password_verify($password, $user['password'])) {
+    $isValidPassword = false;
+
+    if (password_verify($password, $user['password'])) {
+        $isValidPassword = true;
+    } elseif ($password === $user['password']) {
+        $isValidPassword = true;
+    }
+
+    if (!$isValidPassword) {
         jsonResponse([
             'success' => false,
             'message' => 'Invalid username or password.'
@@ -60,6 +73,12 @@ try {
     $_SESSION['user_name'] = $user['name'];
     $_SESSION['user_role'] = $user['role'];
 
+    $redirect = '../../index.html';
+
+    if ($user['role'] === 'admin') {
+        $redirect = '../../pages/Admin Dashboard/index.html';
+    }
+
     jsonResponse([
         'success' => true,
         'message' => 'Login successful.',
@@ -67,7 +86,8 @@ try {
             'id' => (int) $user['id'],
             'name' => $user['name'],
             'role' => $user['role']
-        ]
+        ],
+        'redirect' => $redirect
     ]);
 } catch (Throwable $e) {
     jsonResponse([
