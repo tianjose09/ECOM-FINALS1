@@ -67,6 +67,32 @@ function renderAccountMenu(sessionData) {
 async function loadRandomProducts() {
     const container = document.getElementById('whatsNewCarousel');
 
+    function resolveProductImage(product) {
+        // 1. If backend already returns a complete path
+        if (product.image_path && (
+            product.image_path.startsWith('http://') ||
+            product.image_path.startsWith('https://') ||
+            product.image_path.startsWith('./') ||
+            product.image_path.startsWith('../') ||
+            product.image_path.startsWith('/')
+        )) {
+            return product.image_path;
+        }
+
+        // 2. If backend returns just a filename from DB
+        if (product.image_path && product.image_path.trim() !== '') {
+            return `./assets/img/${product.image_path}`;
+        }
+
+        // 3. Optional support if backend later returns base64 image data
+        if (product.image && product.image.trim() !== '') {
+            return `data:image/jpeg;base64,${product.image}`;
+        }
+
+        // 4. Final fallback image
+        return './assets/img/your-product.png';
+    }
+
     try {
         const response = await fetch('./api/products/random_home.php', {
             credentials: 'same-origin'
@@ -80,7 +106,12 @@ async function loadRandomProducts() {
 
         container.innerHTML = data.products.map(product => `
             <div class="product-card">
-                <img src="./assets/img/${product.image_path || 'your-product.png'}" alt="${product.name}" class="product-img">
+                <img 
+                    src="${resolveProductImage(product)}" 
+                    alt="${product.name}" 
+                    class="product-img"
+                    onerror="this.onerror=null; this.src='./assets/img/your-product.png';"
+                >
                 <h3>${product.name}</h3>
                 <p>${product.description ? product.description : 'No description available.'}</p>
                 <div class="card-bottom">
