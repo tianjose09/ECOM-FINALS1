@@ -38,7 +38,7 @@ function showPopupMessage(message, type = "success", redirectUrl = null) {
     setTimeout(() => {
       popup.remove();
       if (redirectUrl) {
-        window.location.replace(redirectUrl);
+        window.location.href = redirectUrl;
       }
     }, 300);
   }, 1500);
@@ -157,7 +157,7 @@ async function handleLogout(event) {
     }
   } catch (error) {
     console.error("logout error:", error);
-    window.location.replace(`${window.location.origin}/ECOM-FINALS1/pages/Login%20Page/index.html`);
+    window.location.href = `${window.location.origin}/ECOM-FINALS1/pages/Login%20Page/index.html`;
   }
 }
 
@@ -313,10 +313,10 @@ function renderProducts() {
       </div>
       <div class="orders-cell">#${formatNumber(product.total_orders)}</div>
       <div class="actions-cell">
-        <button class="action-btn edit-btn" type="button" title="Edit Product" onclick="openEditProductModal(${product.id})">
+        <button class="action-btn edit-btn" type="button" onclick="openEditProductModal(${product.id})">
           <i class="fas fa-pen-to-square"></i>
         </button>
-        <button class="action-btn delete-btn" type="button" title="Delete Product" onclick="deleteProduct(${product.id})">
+        <button class="action-btn delete-btn" type="button" onclick="deleteProduct(${product.id})">
           <i class="fas fa-trash"></i>
         </button>
       </div>
@@ -340,10 +340,10 @@ function renderUsers() {
         <span>${escapeHtml(user.name)} (${escapeHtml(user.role)})</span>
       </div>
       <div class="user-actions">
-        <button class="action-btn edit-btn" type="button" title="Edit User" onclick="openEditUserModal(${user.id})">
+        <button class="action-btn edit-btn" type="button" onclick="openEditUserModal(${user.id})">
           <i class="fas fa-pen-to-square"></i>
         </button>
-        <button class="action-btn delete-btn" type="button" title="Delete User" onclick="deleteUser(${user.id})">
+        <button class="action-btn delete-btn" type="button" onclick="deleteUser(${user.id})">
           <i class="fas fa-trash"></i>
         </button>
       </div>
@@ -460,8 +460,7 @@ async function handleProductFormSubmit(event) {
 }
 
 window.deleteProduct = async function (productId) {
-  const confirmed = confirm("Delete this product?");
-  if (!confirmed) return;
+  if (!confirm("Delete this product?")) return;
 
   try {
     const response = await fetch(`${API_BASE}/admin/products/delete.php?id=${encodeURIComponent(productId)}`, {
@@ -555,8 +554,7 @@ window.deleteUser = async function (userId) {
     return;
   }
 
-  const confirmed = confirm(`Delete user ${user.name}?`);
-  if (!confirmed) return;
+  if (!confirm(`Delete user ${user.name}?`)) return;
 
   try {
     const response = await fetch(`${API_BASE}/admin/users/delete.php?id=${encodeURIComponent(userId)}`, {

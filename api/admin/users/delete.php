@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../require_admin.php';
 require_once __DIR__ . '/../../../utils/database.utils.php';
+require_once __DIR__ . '/../../helpers/response.php';
 
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -9,73 +10,41 @@ try {
     }
 
     $id = (int) ($_GET['id'] ?? 0);
+
     if ($id <= 0) {
         jsonResponse(['success' => false, 'message' => 'Invalid user ID.'], 422);
     }
 
-    $input = json_decode(file_get_contents('php://input'), true);
-
-    $name = trim($input['name'] ?? '');
-    $password = trim($input['password'] ?? '');
-    $role = trim($input['role'] ?? 'customer');
-
-    if ($name === '') {
-        jsonResponse(['success' => false, 'message' => 'Username is required.'], 422);
-    }
-
-    if (strlen($name) < 3) {
-        jsonResponse(['success' => false, 'message' => 'Username must be at least 3 characters long.'], 422);
-    }
-
-    if (!preg_match('/^[A-Za-z0-9_]+$/', $name)) {
-        jsonResponse(['success' => false, 'message' => 'Username can only contain letters, numbers, and underscore.'], 422);
-    }
-
-    if (!in_array($role, ['customer', 'admin'], true)) {
-        jsonResponse(['success' => false, 'message' => 'Invalid role.'], 422);
-    }
-
-    if ($password !== '' && strlen($password) < 8) {
-        jsonResponse(['success' => false, 'message' => 'Password must be at least 8 characters long.'], 422);
+    if ((int) ($_SESSION['user_id'] ?? 0) === $id) {
+        jsonResponse(['success' => false, 'message' => 'You cannot delete your own admin account.'], 422);
     }
 
     global $conn;
 
-    $checkStmt = $conn->prepare("SELECT id FROM users WHERE name = ? AND id <> ? LIMIT 1");
-    if (!$checkStmt) {
-        throw new Exception('Prepare failed: ' . $conn->error);
-    }
-
-    $checkStmt->bind_param('si', $name, $id);
+    $checkStmt = $conn->prepare("SELECT role FROM users WHERE id = ? LIMIT 1");
+    $checkStmt->bind_param('i', $id);
     $checkStmt->execute();
-    $checkResult = $checkStmt->get_result();
+    $result = $checkStmt->get_result();
+    $user = $result->fetch_assoc();
 
-    if ($checkResult->num_rows > 0) {
-        jsonResponse(['success' => false, 'message' => 'Username already exists.'], 409);
+    if (!$user) {
+        jsonResponse(['success' => false, 'message' => 'User not found.'], 404);
     }
 
-    if ($password !== '') {
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $conn->prepare("UPDATE users SET name = ?, password = ?, role = ? WHERE id = ?");
-        if (!$stmt) {
-            throw new Exception('Prepare failed: ' . $conn->error);
-        }
-        $stmt->bind_param('sssi', $name, $hashedPassword, $role, $id);
-    } else {
-        $stmt = $conn->prepare("UPDATE users SET name = ?, role = ? WHERE id = ?");
-        if (!$stmt) {
-            throw new Exception('Prepare failed: ' . $conn->error);
-        }
-        $stmt->bind_param('ssi', $name, $role, $id);
+    if (($user['role'] ?? '') === 'admin') {
+        jsonResponse(['success' => false, 'message' => 'Deleting admin users is blocked here.'], 403);
     }
+
+    $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
+    $stmt->bind_param('i', $id);
 
     if (!$stmt->execute()) {
-        throw new Exception('Update failed: ' . $stmt->error);
+        throw new Exception('Delete failed: ' . $stmt->error);
     }
 
     jsonResponse([
         'success' => true,
-        'message' => 'User updated successfully.'
+        'message' => 'User deleted successfully.'
     ]);
 } catch (Throwable $e) {
     jsonResponse([

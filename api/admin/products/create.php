@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../require_admin.php';
 require_once __DIR__ . '/../../../utils/database.utils.php';
+require_once __DIR__ . '/../../helpers/response.php';
 
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -19,11 +20,6 @@ try {
 
     if ($name === '' || $category === '' || $price <= 0) {
         jsonResponse(['success' => false, 'message' => 'Please provide valid product details.'], 422);
-    }
-
-    $allowedCategories = ['drinks', 'pastry', 'pasta'];
-    if (!in_array($category, $allowedCategories, true)) {
-        jsonResponse(['success' => false, 'message' => 'Invalid category.'], 422);
     }
 
     global $conn;
