@@ -1,6 +1,10 @@
+const API_BASE = `${window.location.origin}/ECOM-FINALS1/api`;
+
 function togglePassword() {
   const passwordInput = document.getElementById('password');
   const toggleIcon = document.getElementById('toggleIcon');
+
+  if (!passwordInput || !toggleIcon) return;
 
   if (passwordInput.type === 'password') {
     passwordInput.type = 'text';
@@ -11,134 +15,74 @@ function togglePassword() {
   }
 }
 
-async function getSessionUser() {
+function showPopupMessage(message, type = 'success', redirectUrl = null) {
+  const popup = document.createElement('div');
+  popup.className = `custom-popup ${type}`;
+  const icon = type === 'success' ? 'check_circle' : 'error';
+
+  popup.innerHTML = `
+    <span class="material-icons popup-icon">${icon}</span>
+    <span class="popup-text">${message}</span>
+  `;
+
+  document.body.appendChild(popup);
+
+  setTimeout(() => {
+    popup.style.opacity = '0';
+    setTimeout(() => {
+      popup.remove();
+      if (redirectUrl) window.location.href = redirectUrl;
+    }, 300);
+  }, 1500);
+}
+
+async function safeJson(response) {
+  const text = await response.text();
   try {
-    const response = await fetch('../../api/auth/me.php', {
-      credentials: 'same-origin'
-    });
-    return await response.json();
-  } catch (error) {
-    return { success: false, loggedIn: false };
+    return JSON.parse(text);
+  } catch (e) {
+    throw new Error(text || 'Invalid server response');
   }
 }
 
-function setupDropdown(sessionData) {
-  const accountContainer = document.getElementById('accountDropdown');
-  const dropdownMenu = document.getElementById('dropdownMenu');
+document.addEventListener('DOMContentLoaded', function () {
+  const loginBtn = document.getElementById('loginBtn');
+  const nameInput = document.getElementById('name');
+  const passwordInput = document.getElementById('password');
 
-  if (!accountContainer || !dropdownMenu) return;
+  if (!loginBtn) return;
 
-  if (sessionData.loggedIn) {
-    dropdownMenu.innerHTML = `
-      <a href="#">${sessionData.user.name}</a>
-      <a href="#" id="logoutLink">Logout</a>
-    `;
-  } else {
-    dropdownMenu.innerHTML = `
-      <a href="../Login Page/index.html">Login</a>
-      <a href="../Register Page/index.html">Register</a>
-    `;
-  }
+  loginBtn.addEventListener('click', async function (e) {
+    e.preventDefault();
 
-  accountContainer.addEventListener('click', (e) => {
-    e.stopPropagation();
-    dropdownMenu.classList.toggle('show');
-    accountContainer.classList.toggle('show-logout');
+    const name = nameInput.value.trim();
+    const password = passwordInput.value.trim();
 
-    let expanded = accountContainer.getAttribute('aria-expanded') === 'true';
-    accountContainer.setAttribute('aria-expanded', !expanded);
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!accountContainer.contains(e.target)) {
-      dropdownMenu.classList.remove('show');
-      accountContainer.classList.remove('show-logout');
-      accountContainer.setAttribute('aria-expanded', false);
+    if (!name || !password) {
+      showPopupMessage('Please fill in all fields.', 'error');
+      return;
     }
-  });
 
-  dropdownMenu.addEventListener('click', (e) => {
-    e.stopPropagation();
-  });
-
-  const logoutLink = document.getElementById('logoutLink');
-  if (logoutLink) {
-    logoutLink.addEventListener('click', async function (e) {
-      e.preventDefault();
-
-      const response = await fetch('../../api/auth/logout.php', {
+    try {
+      const response = await fetch(`${API_BASE}/auth/login.php`, {
         method: 'POST',
-        credentials: 'same-origin'
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({ name, password })
       });
 
-      const data = await response.json();
+      const data = await safeJson(response);
 
       if (data.success) {
-        alert('Logged out successfully.');
-        window.location.href = '../../index.html';
+        showPopupMessage('Login successful!', 'success', data.redirect || '../../index.html');
       } else {
-        alert(data.message || 'Logout failed.');
+        showPopupMessage(data.message || 'Login failed.', 'error');
       }
-    });
-  }
-}
-
-document.addEventListener('DOMContentLoaded', async function () {
-  const sessionData = await getSessionUser();
-  setupDropdown(sessionData);
-
-  if (sessionData.loggedIn) {
-    window.location.href = '../../index.html';
-    return;
-  }
-
-  const loginBtn = document.getElementById('loginBtn');
-  const navLoginLink = document.getElementById('navLoginLink');
-
-  if (loginBtn) {
-    loginBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
-
-      const name = document.getElementById('name').value.trim();
-      const password = document.getElementById('password').value.trim();
-
-      if (!name || !password) {
-        alert('Please fill in all fields');
-        return;
-      }
-
-      try {
-        const response = await fetch('../../api/auth/login.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          credentials: 'same-origin',
-          body: JSON.stringify({
-            name,
-            password
-          })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          alert('Login successful!');
-          window.location.href = '../../index.html';
-        } else {
-          alert(data.message || 'Login failed.');
-        }
-      } catch (error) {
-        console.error(error);
-        alert('Login failed.');
-      }
-    });
-  }
-
-  if (navLoginLink) {
-    navLoginLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      alert('Already on Login page');
-    });
-  }
+    } catch (error) {
+      console.error('Login error:', error);
+      showPopupMessage('Login failed.', 'error');
+    }
+  });
 });

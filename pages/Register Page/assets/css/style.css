@@ -478,3 +478,39 @@
         max-width: 320px;
       }
     }
+
+    .custom-popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  min-width: 280px;
+  max-width: 380px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.custom-popup.success {
+  background-color: #4CAF50;
+}
+
+.custom-popup.error {
+  background-color: #e74c3c;
+}
+
+.popup-icon {
+  font-size: 22px;
+}
+
+.popup-text {
+  line-height: 1.4;
+}
