@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../require_admin.php';
 require_once __DIR__ . '/../../../utils/database.utils.php';
+require_once __DIR__ . '/../../helpers/response.php';
 
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -9,6 +10,7 @@ try {
     }
 
     $id = (int) ($_GET['id'] ?? 0);
+
     if ($id <= 0) {
         jsonResponse(['success' => false, 'message' => 'Invalid product ID.'], 422);
     }
@@ -16,6 +18,7 @@ try {
     global $conn;
 
     $stmt = $conn->prepare("DELETE FROM products WHERE id = ?");
+
     if (!$stmt) {
         throw new Exception('Prepare failed: ' . $conn->error);
     }
