@@ -1,4 +1,4 @@
-const API_BASE = '/api';
+const API_BASE = '/ECOM-FINALS1/api';
 
 let menuData = {
     drinks: [],
@@ -303,9 +303,8 @@ async function addToCart(productId, basePrice, sectionId, showSuccess = true) {
         }
 
         if (showSuccess) {
-            document.getElementById('successMessage').innerHTML = `Item added to your cart successfully!`;
-            document.getElementById('successModal').style.display = 'flex';
-        }
+    window.location.href = '../Cart Page/index.html';
+}
 
         currentPieces = 1;
         closeModal();

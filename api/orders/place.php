@@ -1,146 +1,157 @@
 <?php
-require_once __DIR__ . '/../utils/database.utils.php';
-require_once __DIR__ . '/../helpers/auth.php';
-require_once __DIR__ . '/../helpers/response.php';
+header('Content-Type: application/json');
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-$userId = getCurrentUserId();
-$input = json_decode(file_get_contents("php://input"), true);
+require_once __DIR__ . '/../../utils/database.utils.php';
 
-$paymentMethod = trim($input["payment_method"] ?? "");
-$deliveryMethod = trim($input["delivery_method"] ?? "pickup");
-$deliveryFee = (float)($input["delivery_fee"] ?? 0);
-$address = trim($input["address"] ?? "");
+$userId = 1;
 
-if ($paymentMethod === "") {
-    jsonResponse(["success" => false, "error" => "Payment method is required"], 400);
+// Accept BOTH JSON and POST
+$data = json_decode(file_get_contents("php://input"), true);
+if (!$data) $data = $_POST;
+
+$payment = $data['payment_method'] ?? '';
+$delivery = $data['delivery_method'] ?? '';
+$fee = (float)($data['delivery_fee'] ?? 0);
+$address = $data['address'] ?? '';
+
+if (!$payment || !$delivery) {
+    echo json_encode(["success" => false, "error" => "Missing data"]);
+    exit;
 }
 
-try {
-    $pdo->beginTransaction();
+// GET ACTIVE CART
+$result = $conn->query("
+    SELECT id FROM carts
+    WHERE user_id = $userId AND status = 'active'
+    LIMIT 1
+");
 
-    $stmt = $pdo->prepare("
-        SELECT id
-        FROM carts
-        WHERE user_id = ? AND status = 'active'
-        ORDER BY id DESC
-        LIMIT 1
-    ");
-    $stmt->execute([$userId]);
-    $cart = $stmt->fetch();
+$cart = $result->fetch_assoc();
 
-    if (!$cart) {
-        $pdo->rollBack();
-        jsonResponse(["success" => false, "error" => "No active cart found"], 400);
-    }
+if (!$cart) {
+    echo json_encode(["success" => false, "error" => "Cart not found"]);
+    exit;
+}
 
-    $cartId = (int)$cart["id"];
+$cartId = $cart['id'];
 
-    $stmt = $pdo->prepare("
-        SELECT *
-        FROM cart_items
-        WHERE cart_id = ?
-        ORDER BY id ASC
-    ");
-    $stmt->execute([$cartId]);
-    $items = $stmt->fetchAll();
+// GET CART ITEMS
+$result = $conn->query("
+    SELECT * FROM cart_items
+    WHERE cart_id = $cartId
+");
 
-    if (!$items) {
-        $pdo->rollBack();
-        jsonResponse(["success" => false, "error" => "Cart is empty"], 400);
-    }
+$items = [];
+$subtotal = 0;
 
-    $subtotal = 0;
-    $itemCount = 0;
+while ($row = $result->fetch_assoc()) {
+    $items[] = $row;
+    $subtotal += $row['unit_price'] * $row['quantity'];
+}
 
-    foreach ($items as $item) {
-        $lineTotal = ((float)$item["unit_price"]) * ((int)$item["quantity"]);
-        $subtotal += $lineTotal;
-        $itemCount += (int)$item["quantity"];
-    }
+if (count($items) === 0) {
+    echo json_encode(["success" => false, "error" => "Cart is empty"]);
+    exit;
+}
 
-    $total = $subtotal + $deliveryFee;
+$total = $subtotal + $fee;
 
-    $estimatedMinutes = 15;
-    if ($deliveryMethod === "delivery") {
-        $estimatedMinutes += 15;
-    }
-    if ($itemCount >= 3) {
-        $estimatedMinutes += 5;
-    }
-    if ($itemCount >= 6) {
-        $estimatedMinutes += 10;
-    }
+// INSERT ORDER
+$orderNumber = 'ORD-' . time();
 
-    $orderNumber = 'ORD-' . date('YmdHis') . '-' . rand(100, 999);
+$stmt = $conn->prepare("
+    INSERT INTO orders (
+        order_number,
+        user_id,
+        cart_id,
+        status,
+        payment_status,
+        payment_method,
+        delivery_method,
+        address,
+        subtotal,
+        delivery_fee,
+        total,
+        estimated_minutes
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+");
 
-    $paymentStatus = $paymentMethod === 'COD' ? 'Unpaid' : 'Payment Pending';
-    $status = $deliveryMethod === 'pickup' ? 'Preparing' : 'Preparing';
+$status = 'Pending';
+$paymentStatus = 'Unpaid';
+$estimated = 30;
 
-    $stmt = $pdo->prepare("
-        INSERT INTO orders (
-            order_number, user_id, cart_id, status, payment_status,
-            payment_method, delivery_method, address, subtotal, delivery_fee, total, estimated_minutes
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ");
-    $stmt->execute([
-        $orderNumber,
-        $userId,
-        $cartId,
-        $status,
-        $paymentStatus,
-        $paymentMethod,
-        $deliveryMethod,
-        $address ?: null,
-        $subtotal,
-        $deliveryFee,
-        $total,
-        $estimatedMinutes
+$stmt->bind_param(
+    "siisssssdddi",
+    $orderNumber,
+    $userId,
+    $cartId,
+    $status,
+    $paymentStatus,
+    $payment,
+    $delivery,
+    $address,
+    $subtotal,
+    $fee,
+    $total,
+    $estimated
+);
+
+$stmt->execute();
+
+if ($stmt->error) {
+    echo json_encode([
+        "success" => false,
+        "error" => $stmt->error
     ]);
+    exit;
+}
 
-    $orderId = (int)$pdo->lastInsertId();
+$orderId = $stmt->insert_id;
 
-    $stmt = $pdo->prepare("
+// ✅ CORRECT ORDER ITEMS INSERT
+foreach ($items as $item) {
+    $stmtItem = $conn->prepare("
         INSERT INTO order_items (
-            order_id, product_id, product_name, category, image,
-            unit_price, quantity, size, pieces, notes, line_total
+            order_id,
+            product_id,
+            product_name,
+            category,
+            image,
+            unit_price,
+            quantity,
+            size,
+            pieces,
+            notes,
+            line_total
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
 
-    foreach ($items as $item) {
-        $lineTotal = ((float)$item["unit_price"]) * ((int)$item["quantity"]);
-        $stmt->execute([
-            $orderId,
-            $item["product_id"],
-            $item["product_name"],
-            $item["category"],
-            $item["image"],
-            $item["unit_price"],
-            $item["quantity"],
-            $item["size"],
-            $item["pieces"],
-            $item["notes"],
-            $lineTotal
-        ]);
-    }
+    $lineTotal = $item['unit_price'] * $item['quantity'];
 
-    $stmt = $pdo->prepare("UPDATE carts SET status = 'ordered' WHERE id = ?");
-    $stmt->execute([$cartId]);
+    $stmtItem->bind_param(
+        "iisssdisssd",
+        $orderId,
+        $item['product_id'],
+        $item['product_name'],
+        $item['category'],
+        $item['image'],
+        $item['unit_price'],
+        $item['quantity'],
+        $item['size'],
+        $item['pieces'],
+        $item['notes'],
+        $lineTotal
+    );
 
-    $pdo->commit();
-
-    jsonResponse([
-        "success" => true,
-        "message" => "Order placed successfully",
-        "order_id" => $orderId,
-        "order_number" => $orderNumber
-    ]);
-} catch (Throwable $e) {
-    if ($pdo->inTransaction()) {
-        $pdo->rollBack();
-    }
-
-    jsonResponse([
-        "success" => false,
-        "error" => $e->getMessage()
-    ], 500);
+    $stmtItem->execute();
 }
+// CLEAR CART
+$conn->query("DELETE FROM cart_items WHERE cart_id = $cartId");
+$conn->query("UPDATE carts SET status = 'completed' WHERE id = $cartId");
+
+echo json_encode([
+    "success" => true,
+    "order_id" => $orderId
+]);

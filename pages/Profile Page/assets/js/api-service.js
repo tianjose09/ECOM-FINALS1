@@ -7,7 +7,7 @@
 
 const API = {
     // Base URL for API endpoints - change this to your actual backend URL
-    BASE_URL: '/api',
+    BASE_URL: 'ECOM-FINALS1/api',
     
     // Flag to use mock data (set to false when backend is ready)
     USE_MOCK: true,

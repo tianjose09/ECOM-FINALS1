@@ -1,69 +1,72 @@
 <?php
-require_once __DIR__ . '/../utils/database.utils.php';
-require_once __DIR__ . '/../helpers/auth.php';
-require_once __DIR__ . '/../helpers/response.php';
+header('Content-Type: application/json');
+error_reporting(0);
 
-$userId = getCurrentUserId();
+require_once __DIR__ . '/../../utils/database.utils.php';
 
-try {
-    $stmt = $pdo->prepare("
-        SELECT id
-        FROM carts
-        WHERE user_id = ? AND status = 'active'
-        ORDER BY id DESC
-        LIMIT 1
-    ");
-    $stmt->execute([$userId]);
-    $cart = $stmt->fetch();
+$userId = 1;
 
-    if (!$cart) {
-        jsonResponse([
-            "success" => true,
-            "cart" => [],
-            "count" => 0
-        ]);
-    }
+// GET ACTIVE CART
+$result = $conn->query("
+    SELECT id FROM carts
+    WHERE user_id = $userId AND status = 'active'
+    LIMIT 1
+");
 
-    $stmt = $pdo->prepare("
-        SELECT
-            ci.id,
-            ci.product_id,
-            ci.product_name AS name,
-            ci.category,
-            ci.image AS img,
-            ci.base_price,
-            ci.unit_price AS price,
-            ci.quantity AS qty,
-            ci.size,
-            ci.pieces,
-            ci.notes
-        FROM cart_items ci
-        WHERE ci.cart_id = ?
-        ORDER BY ci.id ASC
-    ");
-    $stmt->execute([$cart["id"]]);
-    $items = $stmt->fetchAll();
+$cart = $result->fetch_assoc();
 
-    foreach ($items as &$item) {
-        $item["id"] = (int)$item["id"];
-        $item["product_id"] = (int)$item["product_id"];
-        $item["base_price"] = (float)$item["base_price"];
-        $item["price"] = (float)$item["price"];
-        $item["qty"] = (int)$item["qty"];
-        $item["pieces"] = $item["pieces"] !== null ? (int)$item["pieces"] : null;
-        $item["addons"] = $item["notes"] ? [$item["notes"]] : [];
-    }
-
-    $count = array_sum(array_map(fn($i) => (int)$i["qty"], $items));
-
-    jsonResponse([
+if (!$cart) {
+    echo json_encode([
         "success" => true,
-        "cart" => $items,
-        "count" => $count
+        "cart" => [],
+        "count" => 0
     ]);
-} catch (Throwable $e) {
-    jsonResponse([
-        "success" => false,
-        "error" => $e->getMessage()
-    ], 500);
+    exit;
 }
+
+$cartId = $cart['id'];
+
+// GET ALL ITEMS
+$result = $conn->query("
+    SELECT
+        id,
+        product_id,
+        product_name AS name,
+        category,
+        image AS img,
+        base_price,
+        unit_price AS price,
+        quantity AS qty,
+        size,
+        pieces,
+        notes
+    FROM cart_items
+    WHERE cart_id = $cartId
+    ORDER BY id ASC
+");
+
+$items = [];
+
+while ($row = $result->fetch_assoc()) {
+    $row["id"] = (int)$row["id"];
+    $row["product_id"] = (int)$row["product_id"];
+    $row["base_price"] = (float)$row["base_price"];
+    $row["price"] = (float)$row["price"];
+    $row["qty"] = (int)$row["qty"];
+    $row["pieces"] = $row["pieces"] ? (int)$row["pieces"] : null;
+    $row["addons"] = $row["notes"] ? [$row["notes"]] : [];
+
+    $items[] = $row;
+}
+
+// COUNT
+$count = 0;
+foreach ($items as $i) {
+    $count += $i["qty"];
+}
+
+echo json_encode([
+    "success" => true,
+    "cart" => $items,
+    "count" => $count
+]);

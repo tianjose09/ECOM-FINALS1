@@ -1,4 +1,4 @@
-const API_BASE = '/api';
+const API_BASE = '/ECOM-FINALS1/api';
 
 let cart = [];
 let currentFilter = 'all';
