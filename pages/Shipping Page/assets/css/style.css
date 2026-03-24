@@ -167,7 +167,7 @@ body {
 
 .logo-box {
   width: 260px;
-  height: 180px;
+  height: 250px;
   background: #f9f6f2;
   display: flex;
   justify-content: center;
@@ -252,8 +252,8 @@ body {
 }
 
 .rider-avatar {
-  width: 52px;
-  height: 52px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: #f9f6f2;
   border: 1px solid #cdbfae;

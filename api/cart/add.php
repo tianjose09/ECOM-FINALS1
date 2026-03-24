@@ -71,7 +71,7 @@ $conn->query("
         $productId,
         '{$product['name']}',
         '{$product['category']}',
-        '{$product['image']}',
+        '{$product['image_path']}',
         $basePrice,
         $unitPrice,
         $qty,
